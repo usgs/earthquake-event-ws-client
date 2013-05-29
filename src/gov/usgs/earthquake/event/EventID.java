@@ -21,4 +21,8 @@ public class EventID {
 	public String toString() {
 		return this.network + this.code;
 	}
+
+	// Getters
+	public String getNetwork()	{return network;}
+	public String getCode()		{return code;}
 }
