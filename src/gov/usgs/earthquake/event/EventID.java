@@ -5,7 +5,7 @@ package gov.usgs.earthquake.event;
  */
 public class EventID {
 
-	private network, code;
+	private string network, code;
 	
 	/**
 	 * Construct a new EventID from a network and code.
