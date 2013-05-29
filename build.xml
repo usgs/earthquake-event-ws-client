@@ -21,7 +21,7 @@
 	<property name="instrument" location="instrumented"/>
 
 	<fileset id="libs" dir="${lib}">
-		<include name="JSON.jar"/>
+		<include name="json-simple-1.1.1.jar"/>
 	</fileset>
 
 	<fileset id="libs.dev" dir="${lib}">
@@ -117,7 +117,7 @@
 
 			<formatter type="xml"/>
 			<formatter type="plain" usefile="false"/>
-			
+
 			<batchtest todir="${test}">
 				<fileset dir="${src}"  includes="**/*Test.java"/>
 			</batchtest>

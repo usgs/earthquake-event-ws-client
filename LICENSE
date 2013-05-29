@@ -11,7 +11,7 @@ aggrements for each library can be found in the "lib" directory.
 Libraries used at runtime
 -------------------------
 
- - json.jar                (http://json.org/)
+ - json-simple-1.1.1.jar   (https://code.google.com/p/json-simple/)
 
 Libraries used to build/test package
 ------------------------------------
