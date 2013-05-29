@@ -68,3 +68,4 @@ public class JSONEvent {
 	public int getTsunami()				{return json.get("tsunami");}
 	public int getSig()					{return json.get("sig");}
 	public int getNst()					{return json.get("nst");}
+}
