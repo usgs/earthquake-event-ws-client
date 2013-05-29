@@ -5,11 +5,11 @@ package gov.usgs.earthquake.event;
  */
 public class EventID {
 
-	private string network, code;
-	
+	private String network, code;
+
 	/**
 	 * Construct a new EventID from a network and code.
-	 * 
+	 *
 	 * @param [String] network
 	 * @param [String] code
 	 */

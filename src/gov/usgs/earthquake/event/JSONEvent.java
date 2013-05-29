@@ -1,7 +1,8 @@
 package gov.usgs.earthquake.event;
 
 import java.math.BigDecimal;
-import gov.usgs.earthquake.event.EventID;
+
+import org.json.simple.JSONObject;
 
 /**
  * JSON Event class.
@@ -12,7 +13,7 @@ public class JSONEvent {
 	private JSONObject json;
 
 	// These are based off of the feed v1.0 GeoJSON features
-	private static values = [
+	private static String [] values = {
 
 		// doubles
 		"mag", "cdi", "mmi", "dmin", "rms", "gap",
@@ -24,48 +25,48 @@ public class JSONEvent {
 
 		// integers
 		"time", "updated", "tz", "felt", "tsunami", "sig", "nst"
-	];
+	};
 
 	/**
 	 * Construct a new JSONEvent from an existing json object.
-	 * 
-	 * @param [JSONObject] json
+	 *
+	 * @param json
 	 */
 	public JSONEvent(JSONObject json) {
-		this.json = new JSONObject(json, values);
-		eventID = new EventID(this.json.getNetwork(), this.json.getCode());
+		this.json = new JSONObject(json);
+		eventID = new EventID(this.getNet(), this.getCode());
 	}
 
 	// Getters
-	public EventID getEventID()			{return eventID};
+	public EventID getEventID()			{return eventID;}
 
-	public BigDecimal getMag()			{return new BigDecimal(json.get("mag"));}
-	public BigDecimal getCdi()			{return new BigDecimal(json.get("cdi"));}
-	public BigDecimal getMmi()			{return new BigDecimal(json.get("mmi"));}
-	public BigDecimal getDmin()			{return new BigDecimal(json.get("dmin"));}
-	public BigDecimal getRms()			{return new BigDecimal(json.get("rms"));}
-	public BigDecimal getGap()			{return new BigDecimal(json.get("gap"));}
-	public BigDecimal getLongitude()	{return new BigDecimal(json.get("longitude"));}
-	public BigDecimal getLatitude()		{return new BigDecimal(json.get("latitude"));}
-	public BigDecimal getDepth()		{return new BigDecimal(json.get("depth"));}
+	public BigDecimal getMag()			{return new BigDecimal((String) json.get("mag"));}
+	public BigDecimal getCdi()			{return new BigDecimal((String) json.get("cdi"));}
+	public BigDecimal getMmi()			{return new BigDecimal((String) json.get("mmi"));}
+	public BigDecimal getDmin()			{return new BigDecimal((String) json.get("dmin"));}
+	public BigDecimal getRms()			{return new BigDecimal((String) json.get("rms"));}
+	public BigDecimal getGap()			{return new BigDecimal((String) json.get("gap"));}
+	public BigDecimal getLongitude()	{return new BigDecimal((String) json.get("longitude"));}
+	public BigDecimal getLatitude()		{return new BigDecimal((String) json.get("latitude"));}
+	public BigDecimal getDepth()		{return new BigDecimal((String) json.get("depth"));}
 
-	public String getPlace()			{return json.get("place");}
-	public String getUrl()				{return json.get("url");}
-	public String getDetail()			{return json.get("detail");}
-	public String getAlert()			{return json.get("alert");}
-	public String getStatus()			{return json.get("status");}
-	public String getNet()				{return json.get("net");}
-	public String getCode()				{return json.get("code");}
-	public String getIds()				{return json.get("ids");}
-	public String getSources()			{return json.get("sources");}
-	public String getTypes()			{return json.get("types");}
-	public String getMagType()			{return json.get("magType");}
+	public String getPlace()			{return (String) json.get("place");}
+	public String getUrl()				{return (String) json.get("url");}
+	public String getDetail()			{return (String) json.get("detail");}
+	public String getAlert()			{return (String) json.get("alert");}
+	public String getStatus()			{return (String) json.get("status");}
+	public String getNet()				{return (String) json.get("net");}
+	public String getCode()				{return (String) json.get("code");}
+	public String getIds()				{return (String) json.get("ids");}
+	public String getSources()			{return (String) json.get("sources");}
+	public String getTypes()			{return (String) json.get("types");}
+	public String getMagType()			{return (String) json.get("magType");}
 
-	public int getTime()				{return json.get("time");}
-	public int getUpdated()				{return json.get("updated");}
-	public int getTz()					{return json.get("tz");}
-	public int getFelt()				{return json.get("felt");}
-	public int getTsunami()				{return json.get("tsunami");}
-	public int getSig()					{return json.get("sig");}
-	public int getNst()					{return json.get("nst");}
+	public int getTime()				{return Integer.parseInt((String) json.get("time"));}
+	public int getUpdated()				{return Integer.parseInt((String) json.get("updated"));}
+	public int getTz()					{return Integer.parseInt((String) json.get("tz"));}
+	public int getFelt()				{return Integer.parseInt((String) json.get("felt"));}
+	public int getTsunami()				{return Integer.parseInt((String) json.get("tsunami"));}
+	public int getSig()					{return Integer.parseInt((String) json.get("sig"));}
+	public int getNst()					{return Integer.parseInt((String) json.get("nst"));}
 }

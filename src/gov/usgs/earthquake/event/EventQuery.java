@@ -34,14 +34,14 @@ public class EventQuery {
 		contributor,
 		productType;
 
-	private bool
+	private boolean
 		includeAllOrigins,
 		includeAllMagnitudes,
 		includeArrivals,
 		kmlAnimated;
 
 	private enum OrderBy {
-		TIME("time"), TIME-ASC, MAGNITUDE, MAGNITUDE-ASC
+		TIME, TIME_ASC, MAGNITUDE, MAGNITUDE_ASC
 	}
 	private OrderBy orderBy;
 
@@ -108,12 +108,12 @@ public class EventQuery {
 	public String getContributor()			{return contributor;}
 	public String getProductType()			{return productType;}
 
-	public bool getIncludeAllOrigins()		{return includeAllOrigins;}
-	public bool getIncludeAllMagnitudes()	{return includeAllMagnitudes;}
-	public bool getIncludeArrivals()		{return includeArrivals;}
-	public bool getKmlAnimated()			{return kmlAnimated;}
+	public boolean getIncludeAllOrigins()		{return includeAllOrigins;}
+	public boolean getIncludeAllMagnitudes()	{return includeAllMagnitudes;}
+	public boolean getIncludeArrivals()		{return includeArrivals;}
+	public boolean getKmlAnimated()			{return kmlAnimated;}
 
-	public String getOrderBy()				{return orderBy.name().toLowerCase();}
+	public String getOrderBy()				{return orderBy.name().toLowerCase().replace("_", "-");}
 	public String getFormat()				{return format.name().toLowerCase();}
 	public String getKmlColorBy()			{return kmlColorBy.name().toLowerCase();}
 	public String getReviewStatus()			{return reviewStatus.name().toLowerCase();}
@@ -156,14 +156,14 @@ public class EventQuery {
 	public void setContributor(String in)		{contributor = in;}
 	public void setProductType(String in)		{productType = in;}
 
-	public void setIncludeAllOrigins(bool in)	{includeAllOrigins = in;}
-	public void setIncludeAllMagnitudes(bool in){includeAllMagnitudes = in;}
-	public void setIncludeArrivals(bool in)		{includeArrivals = in;}
-	public void setKmlAnimated(bool in)			{kmlAnimated = in;}
+	public void setIncludeAllOrigins(boolean in)	{includeAllOrigins = in;}
+	public void setIncludeAllMagnitudes(boolean in){includeAllMagnitudes = in;}
+	public void setIncludeArrivals(boolean in)		{includeArrivals = in;}
+	public void setKmlAnimated(boolean in)			{kmlAnimated = in;}
 
-	public void setOrderBy(String in)			{orderBy = OrderBy.valueOf(in.toUpperCase());}
+	public void setOrderBy(String in)			{orderBy = OrderBy.valueOf(in.replace("-", "_").toUpperCase());}
 	public void setFormat(String in)			{format = Format.valueOf(in.toUpperCase());}
-	public void setKmlColorBy(String in)		{kmlColorBy = KmlcolorBy.valueOf(in.toUpperCase());}
+	public void setKmlColorBy(String in)		{kmlColorBy = KmlColorBy.valueOf(in.toUpperCase());}
 	public void setReviewStatus(String in)		{reviewStatus = ReviewStatus.valueOf(in.toUpperCase());}
 	public void setAlertLevel(String in)		{alertLevel = AlertLevel.valueOf(in.toUpperCase());}
 }
