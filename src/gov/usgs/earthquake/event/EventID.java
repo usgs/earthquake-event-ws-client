@@ -21,6 +21,10 @@ public class EventID {
 	public String toString() {
 		return this.network + this.code;
 	}
+	
+	public boolean equals(String in) {
+		return in.equals(network + code);
+	}
 
 	// Getters
 	public String getNetwork()	{return network;}
