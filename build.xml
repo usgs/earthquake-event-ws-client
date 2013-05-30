@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="EventWebService" default="jar" basedir=".">
+	<description>
+		Utility to query USGS FDSN Event Web Service
+		(http://comcat.cr.usgs.gov/fdsnws/event/1/).
+	</description>
+
+	<property name="src" location="src"/>
+	<property name="lib" location="lib"/>
+	<property name="build" location="build"/>
+	<property name="dist" location="dist"/>
+	<property name="jarfile" location="${dist}/${ant.project.name}.jar"/>
+	<property name="compile.debug" value="true"/>
+
+	<property name="test" location="${dist}/reports/test"/>
+	<property name="test.html" location="${test}/html"/>
+	<property name="coverage" location="${dist}/reports/coverage"/>
+	<property name="coverage.html" location="${coverage}/html"/>
+
+	<property name="cobertura" location="lib/cobertura-2.0"/>
+	<property name="instrument" location="instrumented"/>
+
+	<fileset id="libs" dir="${lib}">
+		<include name="json-simple-1.1.1.jar"/>
+	</fileset>
+
+	<fileset id="libs.dev" dir="${lib}">
+		<include name="junit-4.11.jar"/>
+		<include name="hamcrest-core-1.3.jar"/>
+		<include name="cobertura.jar"/>
+		<include name="asm-4.1.jar"/>
+		<include name="log4j-1.2.9.jar"/>
+		<include name="asm-commons-4.1.jar"/>
+		<include name="jakarta-oro-2.0.8.jar"/>
+		<include name="asm-tree-4.1.jar"/>
+
+			<!--
+				The following libraries were distributed with Cobertura but were not
+				needed for how we were using it. If they become required, feel free to
+				fetch them again and add them to the project.
+			<include name="ant-launcher-1.8.3.jar"/>
+			<include name="commons-io-2.4-javadoc.jar"/>
+			<include name="ant-1.8.3.jar"/>
+			<include name="commons-io-2.4.jar"/>
+			<include name="ant-junit-1.9.0.jar"/>
+			-->
+	</fileset>
+
+	<path id="classpath">
+		<pathelement path="${build}"/>
+		<fileset refid="libs"/>
+		<fileset refid="libs.dev"/>
+	</path>
+
+	<taskdef classpathref="classpath" resource="tasks.properties"/>
+
+
+	<target name="all" depends="clean,jar,javadoc,test,coverage"
+			description="Do everything"/>
+
+	<target name="clean" description="Remove build and dist directories">
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+		<delete dir="${instrument}"/>
+		<delete file="cobertura.ser"/>
+	</target>
+
+	<target name="compile" description="Compile code">
+		<mkdir dir="${build}"/>
+
+		<javac srcdir="${src}" destdir="${build}" source="1.6" target="1.6"
+				includeAntRuntime="no" classpathref="classpath"
+				debug="${compile.debug}">
+			<src path="${src}"/>
+		</javac>
+	</target>
+
+	<target name="jar" depends="compile" description="Build jar">
+		<mkdir dir="${dist}"/>
+
+		<jar jarfile="${jarfile}" basedir="${build}" excludes="**/*Test*">
+			<zipgroupfileset refid="libs"/>
+		</jar>
+	</target>
+
+	<target name="javadoc" depends="compile" description="Generate Javadoc">
+		<mkdir dir="${dist}"/>
+
+		<javadoc destdir="${dist}/javadoc" packagenames="gov**"
+				classpathref="classpath">
+			<fileset dir="${src}" excludes="**/*Test*"/>
+		</javadoc>
+	</target>
+
+	<target name="instrument" depends="compile"
+			description="Cobertura instrumentation for coverage">
+		<delete file="cobertura.ser"/>
+		<delete dir="${instrument}"/>
+
+		<cobertura-instrument todir="${instrument}">
+			<!-- Ignore logging lines (if applicable) -->
+			<!--<ignore regex="org.apache.log4j.*"/>-->
+
+			<fileset dir="${build}">
+				<include name="**/*.class"/>
+				<exclude name="**/*Test*.class"/>
+			</fileset>
+		</cobertura-instrument>
+	</target>
+
+	<target name="test" depends="instrument" description="Run JUnit tests">
+		<mkdir dir="${test.html}"/>
+
+		<junit fork="yes" printsummary="yes" haltonfailure="yes">
+			<classpath location="${instrument}"/>
+			<classpath refid="classpath"/> <!-- Only after instrumented classes -->
+
+			<formatter type="xml"/>
+			<formatter type="plain" usefile="false"/>
+
+			<batchtest todir="${test}">
+				<fileset dir="${src}"  includes="**/*Test.java"/>
+			</batchtest>
+		</junit>
+
+		<junitreport todir="${test}">
+			<fileset dir="${test}">
+				<include name="TEST-*.xml"/>
+			</fileset>
+			<report format="frames" todir="${test.html}"/>
+		</junitreport>
+	</target>
+
+	<target name="coverage" depends="test" description="Run coverage tests">
+		<mkdir dir="${coverage.html}"/>
+
+		<cobertura-report srcdir="${src}" destdir="${coverage}" format="xml"/>
+		<cobertura-report destdir="${coverage.html}">
+			<fileset dir="${src}">
+				<include name="**/*java"/>
+			</fileset>
+		</cobertura-report>
+	</target>
+
+</project>
