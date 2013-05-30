@@ -40,29 +40,10 @@ public class EventQuery {
 		includeArrivals,
 		kmlAnimated;
 
-	private enum OrderBy {
-		TIME, TIME_ASC, MAGNITUDE, MAGNITUDE_ASC
-	}
 	private OrderBy orderBy;
-
-	private enum Format {
-		QUAKEML, CSV, GEOJSON, KML
-	}
 	private Format format;
-
-	private enum KmlColorBy {
-		AGE, DEPTH
-	}
 	private KmlColorBy kmlColorBy;
-
-	private enum ReviewStatus {
-		ALL, AUTOMATIC, REVIEWED
-	}
 	private ReviewStatus reviewStatus;
-
-	private enum AlertLevel {
-		ALL, GREEN, YELLOW, ORANGE, RED
-	}
 	private AlertLevel alertLevel;
 
 	/**
@@ -108,16 +89,16 @@ public class EventQuery {
 	public String getContributor()			{return contributor;}
 	public String getProductType()			{return productType;}
 
-	public boolean getIncludeAllOrigins()		{return includeAllOrigins;}
-	public boolean getIncludeAllMagnitudes()	{return includeAllMagnitudes;}
+	public boolean getIncludeAllOrigins()	{return includeAllOrigins;}
+	public boolean getIncludeAllMagnitudes(){return includeAllMagnitudes;}
 	public boolean getIncludeArrivals()		{return includeArrivals;}
 	public boolean getKmlAnimated()			{return kmlAnimated;}
 
-	public String getOrderBy()				{return orderBy.name().toLowerCase().replace("_", "-");}
-	public String getFormat()				{return format.name().toLowerCase();}
-	public String getKmlColorBy()			{return kmlColorBy.name().toLowerCase();}
-	public String getReviewStatus()			{return reviewStatus.name().toLowerCase();}
-	public String getAlertLevel()			{return alertLevel.name().toLowerCase();}
+	public OrderBy getOrderBy()				{return orderBy;}
+	public Format getFormat()				{return format;}
+	public KmlColorBy getKmlColorBy()		{return kmlColorBy;}
+	public ReviewStatus getReviewStatus()	{return reviewStatus;}
+	public AlertLevel getAlertLevel()		{return alertLevel;}
 
 	// Setters
 	public void setStartTime(long in)			{startTime = in;}
@@ -156,14 +137,14 @@ public class EventQuery {
 	public void setContributor(String in)		{contributor = in;}
 	public void setProductType(String in)		{productType = in;}
 
-	public void setIncludeAllOrigins(boolean in)	{includeAllOrigins = in;}
+	public void setIncludeAllOrigins(boolean in){includeAllOrigins = in;}
 	public void setIncludeAllMagnitudes(boolean in){includeAllMagnitudes = in;}
-	public void setIncludeArrivals(boolean in)		{includeArrivals = in;}
-	public void setKmlAnimated(boolean in)			{kmlAnimated = in;}
+	public void setIncludeArrivals(boolean in)	{includeArrivals = in;}
+	public void setKmlAnimated(boolean in)		{kmlAnimated = in;}
 
-	public void setOrderBy(String in)			{orderBy = OrderBy.valueOf(in.replace("-", "_").toUpperCase());}
-	public void setFormat(String in)			{format = Format.valueOf(in.toUpperCase());}
-	public void setKmlColorBy(String in)		{kmlColorBy = KmlColorBy.valueOf(in.toUpperCase());}
-	public void setReviewStatus(String in)		{reviewStatus = ReviewStatus.valueOf(in.toUpperCase());}
-	public void setAlertLevel(String in)		{alertLevel = AlertLevel.valueOf(in.toUpperCase());}
+	public void setOrderBy(OrderBy in)			{orderBy = in;}
+	public void setFormat(Format in)			{format = in;}
+	public void setKmlColorBy(KmlColorBy in)	{kmlColorBy = in;}
+	public void setReviewStatus(ReviewStatus in){reviewStatus = in;}
+	public void setAlertLevel(AlertLevel in)	{alertLevel = in;}
 }
