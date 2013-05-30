@@ -12,21 +12,6 @@ public class JSONEvent {
 	private EventID eventID;
 	private JSONObject json;
 
-	// These are based off of the feed v1.0 GeoJSON features
-	private static String [] values = {
-
-		// doubles
-		"mag", "cdi", "mmi", "dmin", "rms", "gap",
-		"longitude", "latitude", "depth",
-
-		// strings
-		"place", "url", "detail", "alert", "status",
-		"net", "code", "ids", "sources", "types", "magType",
-
-		// integers
-		"time", "updated", "tz", "felt", "tsunami", "sig", "nst"
-	};
-
 	/**
 	 * Construct a new JSONEvent from an existing json object.
 	 *
