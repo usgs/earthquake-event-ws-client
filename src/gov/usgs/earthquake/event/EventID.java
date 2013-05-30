@@ -22,8 +22,11 @@ public class EventID {
 		return this.network + this.code;
 	}
 	
-	public boolean equals(String in) {
-		return in.equals(network + code);
+	public boolean equals(EventID in) {
+		return (
+			in.getNetwork().equals(network) &&
+			in.getCode().equals(code)
+		);
 	}
 
 	// Getters
