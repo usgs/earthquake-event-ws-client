@@ -237,7 +237,7 @@ public class JSONEventTest {
 		json.put("time", test);
 		JSONEvent event = new JSONEvent(json);
 
-		Assert.assertEquals(Integer.parseInt(test), event.getTime());
+		Assert.assertEquals(new Integer(test), event.getTime());
 	}
 
 	@Test
@@ -247,7 +247,7 @@ public class JSONEventTest {
 		json.put("updated", test);
 		JSONEvent event = new JSONEvent(json);
 
-		Assert.assertEquals(Integer.parseInt(test), event.getUpdated());
+		Assert.assertEquals(new Integer(test), event.getUpdated());
 	}
 
 	@Test
@@ -257,7 +257,7 @@ public class JSONEventTest {
 		json.put("tz", test);
 		JSONEvent event = new JSONEvent(json);
 
-		Assert.assertEquals(Integer.parseInt(test), event.getTz());
+		Assert.assertEquals(new Integer(test), event.getTz());
 	}
 
 	@Test
@@ -267,7 +267,7 @@ public class JSONEventTest {
 		json.put("felt", test);
 		JSONEvent event = new JSONEvent(json);
 
-		Assert.assertEquals(Integer.parseInt(test), event.getFelt());
+		Assert.assertEquals(new Integer(test), event.getFelt());
 	}
 
 	@Test
@@ -277,7 +277,7 @@ public class JSONEventTest {
 		json.put("tsunami", test);
 		JSONEvent event = new JSONEvent(json);
 
-		Assert.assertEquals(Integer.parseInt(test), event.getTsunami());
+		Assert.assertEquals(new Integer(test), event.getTsunami());
 	}
 
 	@Test
@@ -287,7 +287,7 @@ public class JSONEventTest {
 		json.put("sig", test);
 		JSONEvent event = new JSONEvent(json);
 
-		Assert.assertEquals(Integer.parseInt(test), event.getSig());
+		Assert.assertEquals(new Integer(test), event.getSig());
 	}
 
 	@Test
@@ -297,6 +297,36 @@ public class JSONEventTest {
 		json.put("nst", test);
 		JSONEvent event = new JSONEvent(json);
 
-		Assert.assertEquals(Integer.parseInt(test), event.getNst());
+		Assert.assertEquals(new Integer(test), event.getNst());
+	}
+
+	@Test
+	public void testNullDecimal() {
+		String test = null;
+
+		json.put("mag", test);
+		JSONEvent event = new JSONEvent(json);
+
+		Assert.assertNull(event.getMag());
+	}
+
+	@Test
+	public void testNullString() {
+		String test = null;
+
+		json.put("place", test);
+		JSONEvent event = new JSONEvent(json);
+
+		Assert.assertNull(event.getPlace());
+	}
+
+	@Test
+	public void testNullInteger() {
+		String test = null;
+
+		json.put("time", test);
+		JSONEvent event = new JSONEvent(json);
+
+		Assert.assertNull(event.getTime());
 	}
 }
