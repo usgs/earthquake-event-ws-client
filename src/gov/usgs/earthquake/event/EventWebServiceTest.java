@@ -1,5 +1,6 @@
 package gov.usgs.earthquake.event;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Date;
@@ -26,7 +27,7 @@ public class EventWebServiceTest {
 	}
 
 	/**
-	 * Make a request to the EventWebService using an empty request object.
+	 * Make a request to the EventWebService.
 	 * 
 	 * @throws Exception
 	 */
@@ -41,8 +42,65 @@ public class EventWebServiceTest {
 		query.setMinMagnitude(new BigDecimal("2.5"));
 
 		List<JSONEvent> events = service.getEvents(query);
-		System.err.println(events.size() + " M2.5+ events, past day");
 		Assert.assertTrue("events in past day", events.size() > 0);
 	}
 
+	/**
+	 * Make a request for one event.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testDetailRequest() throws Exception {
+		EventWebService service = new EventWebService(SERVICE_URL);
+
+		EventQuery query = new EventQuery();
+		// past day
+		query.setStartTime(new Date(new Date().getTime() - 24 * 60 * 60 * 1000));
+		// M2.5+
+		query.setMinMagnitude(new BigDecimal("2.5"));
+		// only need 1 event
+		query.setLimit(1);
+
+		List<JSONEvent> events = service.getEvents(query);
+		Assert.assertTrue("most recent event in past day", events.size() > 0);
+
+		EventQuery detailQuery = new EventQuery();
+		detailQuery.setEventId(events.get(0).getEventID().toString());
+		events = service.getEvents(detailQuery);
+		Assert.assertTrue("one event in detail query", events.size() == 1);
+	}
+
+	/**
+	 * Make a request to the EventWebService using a quakeml format.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testQuakeml() throws Exception {
+		EventWebService service = new EventWebService(SERVICE_URL);
+
+		EventQuery query = new EventQuery();
+		// past day
+		query.setStartTime(new Date(new Date().getTime() - 24 * 60 * 60 * 1000));
+		// M2.5+
+		query.setMinMagnitude(new BigDecimal("2.5"));
+		query.setFormat(Format.QUAKEML);
+
+		InputStream quakeml = service.getInputStream(service
+				.getURL(query, null));
+		try {
+			int read = 0;
+			byte[] buf = new byte[1024];
+			while ((read = quakeml.read(buf)) != -1) {
+				System.err.write(buf, 0, read);
+			}
+		} finally {
+			try {
+				quakeml.close();
+			} catch (Exception e) {
+				// ignore
+			}
+		}
+	}
 }
