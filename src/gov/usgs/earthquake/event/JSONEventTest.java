@@ -1,8 +1,10 @@
 package gov.usgs.earthquake.event;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,323 +12,183 @@ import org.junit.Test;
 
 public class JSONEventTest {
 
-	private JSONObject json = null;
+	JSONEvent event = null;
 
 	@Before
 	public void setup() {
-		json = new JSONObject();
+		String feature = "{\"type\":\"Feature\",\"properties\":{\"" +
+				"mag\":6.4,\"" +
+				"place\":\"140km WNW of Neiafu, Tonga\",\"" +
+				"time\":1368305217500,\"" +
+				"updated\":1369489291000,\"" +
+				"tz\":-720,\"" +
+				"url\":\"http://earthquake.usgs.gov/earthquakes/eventpage/usc000gudx\",\"" +
+				"detail\":\"http://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/usc000gudx.geojson\",\"" +
+				"felt\":2,\"" +
+				"cdi\":4.1,\"" +
+				"mmi\":4.09,\"" +
+				"alert\":\"green\",\"" +
+				"status\":\"REVIEWED\",\"" +
+				"tsunami\":null,\"" +
+				"sig\":631,\"" +
+				"net\":\"us\",\"" +
+				"code\":\"c000gudx\",\"" +
+				"ids\":\",pt13131001,at00mmnj2c,usc000gudx,\",\"" +
+				"sources\":\",pt,at,us,\",\"" +
+				"types\":\",cap,dyfi,geoserve,losspager,moment-tensor,nearby-cities,origin,p-wave-travel-times,phase-data,scitech-link,shakemap,tectonic-summary,\",\"" +
+				"nst\":520,\"" +
+				"dmin\":5.02427738,\"" +
+				"rms\":0.54,\"" +
+				"gap\":32.4,\"" +
+				"magType\":\"Mw\",\"" +
+				"type\":\"earthquake\"},\"" +
+				"geometry\":{\"type\":\"Point\",\"coordinates\":[-175.099,-17.954,212.2]},\"" +
+				"id\":\"usc000gudx\"}";
+		Object obj = JSONValue.parse(feature);
+		JSONObject json = (JSONObject)obj;
+		event = new JSONEvent(json);
 	}
 
 	@Test
 	public void testEventId() {
-		String network = "network";
-		String code = "code";
+		String network = "us";
+		String code = "c000gudx";
 		EventID id = new EventID(network, code);
-
-		json.put("net", network);
-		json.put("code", code);
-		JSONEvent event = new JSONEvent(json);
-
 		Assert.assertTrue(id.equals(event.getEventID()));
 	}
 
 	@Test
 	public void testMag() {
-		String mag = "4.5";
-
-		json.put("mag", mag);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new BigDecimal(mag), event.getMag());
+		Assert.assertEquals(new BigDecimal("6.4"), event.getMag());
 	}
 
 	@Test
 	public void testCdi() {
-		String cdi = "4.25";
-
-		json.put("cdi", cdi);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new BigDecimal(cdi), event.getCdi());
+		Assert.assertEquals(new BigDecimal("4.1"), event.getCdi());
 	}
 
 	@Test
 	public void testMmi() {
-		String mmi = "5.5";
-
-		json.put("mmi", mmi);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new BigDecimal(mmi), event.getMmi());
+		Assert.assertEquals(new BigDecimal("4.09"), event.getMmi());
 	}
 
 	@Test
 	public void testDmin() {
-		String test = "5.5";
-
-		json.put("dmin", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new BigDecimal(test), event.getDmin());
+		Assert.assertEquals(new BigDecimal("5.02427738"), event.getDmin());
 	}
 
 	@Test
 	public void testRms() {
-		String test = "5.5";
-
-		json.put("rms", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new BigDecimal(test), event.getRms());
+		Assert.assertEquals(new BigDecimal("0.54"), event.getRms());
 	}
 
 	@Test
 	public void testGap() {
-		String test = "5.5";
-
-		json.put("gap", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new BigDecimal(test), event.getGap());
+		Assert.assertEquals(new BigDecimal("32.4"), event.getGap());
 	}
 
 	@Test
 	public void testLongitude() {
-		String test = "5.5";
-
-		json.put("longitude", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new BigDecimal(test), event.getLongitude());
+		Assert.assertEquals(new BigDecimal("-175.099"), event.getLongitude());
 	}
 
 	@Test
 	public void testLatitude() {
-		String test = "5.5";
-
-		json.put("latitude", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new BigDecimal(test), event.getLatitude());
+		Assert.assertEquals(new BigDecimal("-17.954"), event.getLatitude());
 	}
 
 	@Test
 	public void testDepth() {
-		String test = "5.5";
-
-		json.put("depth", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new BigDecimal(test), event.getDepth());
+		Assert.assertEquals(new BigDecimal("212.2"), event.getDepth());
 	}
 
 	@Test
 	public void testPlace() {
-		String test = "5.5";
-
-		json.put("place", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(test, event.getPlace());
+		Assert.assertEquals("140km WNW of Neiafu, Tonga", event.getPlace());
 	}
 
 	@Test
 	public void testUrl() {
-		String test = "5.5";
-
-		json.put("url", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(test, event.getUrl());
+		Assert.assertEquals("http://earthquake.usgs.gov/earthquakes/eventpage/usc000gudx", event.getUrl());
 	}
 
 	@Test
 	public void testDetail() {
-		String test = "5.5";
-
-		json.put("detail", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(test, event.getDetail());
+		Assert.assertEquals("http://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/usc000gudx.geojson", event.getDetail());
 	}
 
 	@Test
 	public void testAlert() {
-		String test = "5.5";
-
-		json.put("alert", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(test, event.getAlert());
+		Assert.assertEquals("green", event.getAlert());
 	}
 
 	@Test
 	public void testStatus() {
-		String test = "5.5";
-
-		json.put("status", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(test, event.getStatus());
+		Assert.assertEquals("reviewed", event.getStatus().toLowerCase());
 	}
 
 	@Test
 	public void testNet() {
-		String test = "5.5";
-
-		json.put("net", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(test, event.getNet());
+		Assert.assertEquals("us", event.getNet());
 	}
 
 	@Test
 	public void testCode() {
-		String test = "5.5";
-
-		json.put("code", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(test, event.getCode());
+		Assert.assertEquals("c000gudx", event.getCode());
 	}
 
 	@Test
 	public void testIds() {
-		String test = "5.5";
-
-		json.put("ids", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(test, event.getIds());
+		Assert.assertEquals(",pt13131001,at00mmnj2c,usc000gudx,", event.getIds());
 	}
 
 	@Test
 	public void testSources() {
-		String test = "5.5";
-
-		json.put("sources", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(test, event.getSources());
+		Assert.assertEquals(",pt,at,us,", event.getSources());
 	}
 
 	@Test
 	public void testTypes() {
-		String test = "5.5";
-
-		json.put("types", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(test, event.getTypes());
+		Assert.assertEquals(",cap,dyfi,geoserve,losspager,moment-tensor,nearby-cities,origin,p-wave-travel-times,phase-data,scitech-link,shakemap,tectonic-summary,", event.getTypes());
 	}
 
 	@Test
 	public void testMagType() {
-		String test = "5.5";
-
-		json.put("magType", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(test, event.getMagType());
+		Assert.assertEquals("Mw", event.getMagType());
 	}
 
 	@Test
 	public void testTime() {
-		String test = "5";
-
-		json.put("time", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new Integer(test), event.getTime());
+		Assert.assertEquals(new Date(1368305217500L), event.getTime());
 	}
 
 	@Test
 	public void testUpdated() {
-		String test = "5";
-
-		json.put("updated", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new Integer(test), event.getUpdated());
+		Assert.assertEquals(new Date(1369489291000L), event.getUpdated());
 	}
 
 	@Test
 	public void testTz() {
-		String test = "5";
-
-		json.put("tz", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new Integer(test), event.getTz());
+		Assert.assertEquals(new Integer("-720"), event.getTz());
 	}
 
 	@Test
 	public void testFelt() {
-		String test = "5";
-
-		json.put("felt", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new Integer(test), event.getFelt());
+		Assert.assertEquals(new Integer("2"), event.getFelt());
 	}
 
 	@Test
 	public void testTsunami() {
-		String test = "5";
-
-		json.put("tsunami", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new Integer(test), event.getTsunami());
+		Assert.assertEquals(null, event.getTsunami());
 	}
 
 	@Test
 	public void testSig() {
-		String test = "5";
-
-		json.put("sig", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new Integer(test), event.getSig());
+		Assert.assertEquals(new Integer("631"), event.getSig());
 	}
 
 	@Test
 	public void testNst() {
-		String test = "5";
-
-		json.put("nst", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertEquals(new Integer(test), event.getNst());
-	}
-
-	@Test
-	public void testNullDecimal() {
-		String test = null;
-
-		json.put("mag", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertNull(event.getMag());
-	}
-
-	@Test
-	public void testNullString() {
-		String test = null;
-
-		json.put("place", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertNull(event.getPlace());
-	}
-
-	@Test
-	public void testNullInteger() {
-		String test = null;
-
-		json.put("time", test);
-		JSONEvent event = new JSONEvent(json);
-
-		Assert.assertNull(event.getTime());
+		Assert.assertEquals(new Integer("520"), event.getNst());
 	}
 }
