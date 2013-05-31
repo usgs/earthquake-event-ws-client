@@ -1,8 +1,11 @@
 package gov.usgs.earthquake.event;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -232,22 +235,22 @@ public class JSONEventTest {
 
 	@Test
 	public void testTime() {
-		String test = "5";
+		String test = "111111";
 
 		json.put("time", test);
 		JSONEvent event = new JSONEvent(json);
 
-		Assert.assertEquals(new Integer(test), event.getTime());
+		Assert.assertEquals(new Date(111111), event.getTime());
 	}
 
 	@Test
 	public void testUpdated() {
-		String test = "5";
+		String test = "111111";
 
 		json.put("updated", test);
 		JSONEvent event = new JSONEvent(json);
 
-		Assert.assertEquals(new Integer(test), event.getUpdated());
+		Assert.assertEquals(new Date(111111), event.getUpdated());
 	}
 
 	@Test
@@ -324,9 +327,29 @@ public class JSONEventTest {
 	public void testNullInteger() {
 		String test = null;
 
+		json.put("tz", test);
+		JSONEvent event = new JSONEvent(json);
+
+		Assert.assertNull(event.getTz());
+	}
+
+	@Test
+	public void testNullDate() {
+		String test = null;
+
 		json.put("time", test);
 		JSONEvent event = new JSONEvent(json);
 
 		Assert.assertNull(event.getTime());
+	}
+	
+	@Test
+	public void testParse() {
+		String feature = "{\"type\":\"Feature\",\"properties\":{\"mag\":0.9,\"place\":\"37km SE of North Nenana, Alaska\",\"time\":1370011183000,\"updated\":1370012004850,\"tz\":-480,\"url\":\"http://ehpd-earthquake.cr.usgs.gov/earthquakes/eventpage/ak10727821\",\"detail\":\"http://ehpd-earthquake.cr.usgs.gov/earthquakes/feed/v1.0/detail/ak10727821.geojson\",\"felt\":null,\"cdi\":null,\"mmi\":null,\"alert\":null,\"status\":\"AUTOMATIC\",\"tsunami\":null,\"sig\":12,\"net\":\"ak\",\"code\":\"10727821\",\"ids\":\",ak10727821,\",\"sources\":\",ak,\",\"types\":\",general-link,geoserve,nearby-cities,origin,tectonic-summary,\",\"nst\":null,\"dmin\":null,\"rms\":0.69,\"gap\":null,\"magType\":\"Ml\",\"type\":\"earthquake\"},\"geometry\":{\"type\":\"Point\",\"coordinates\":[-148.6553,64.3086,27.8]},\"id\":\"ak10727821\"}";
+		Object obj = JSONValue.parse(feature);
+		JSONObject json = (JSONObject)obj;
+		JSONEvent event = new JSONEvent(json);
+		Assert.assertNotNull(event);
+		Assert.assertEquals(0.9, event.getMag());
 	}
 }
