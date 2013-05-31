@@ -1,6 +1,7 @@
 package gov.usgs.earthquake.event;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -80,4 +81,21 @@ public class JSONUtil {
 		return null;
 	}
 
+	public static Integer getInteger(final Object o) {
+		if (o instanceof Integer) {
+			return (Integer) o;
+		} else if (o instanceof Long) {
+			return o != null ? ((Long) o).intValue() : null;
+		}
+		return null;
+	}
+
+	public static Date getDate(final Object o) {
+		if (o instanceof Long) {
+			return new Date((Long) o);
+		} else if (o instanceof Date) {
+			return (Date) o;
+		}
+		return null;
+	}
 }

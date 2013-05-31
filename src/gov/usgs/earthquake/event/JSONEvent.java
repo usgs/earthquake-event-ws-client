@@ -1,7 +1,9 @@
 package gov.usgs.earthquake.event;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
@@ -9,7 +11,6 @@ import org.json.simple.JSONObject;
  */
 public class JSONEvent {
 
-	private EventID eventID;
 	private JSONObject json;
 
 	/**
@@ -19,59 +20,49 @@ public class JSONEvent {
 	 */
 	public JSONEvent(JSONObject json) {
 		this.json = new JSONObject(json);
-		eventID = new EventID(this.getNet(), this.getCode());
 	}
 
-	private Integer getInteger(String key) {
-		String value = (String) json.get(key);
-		try {
-			return new Integer(value);
-		} catch (NumberFormatException e) {
-			return null;
-		}
+	private JSONObject getProperties() {
+		return JSONUtil.getJSONObject(json.get("properties"));
 	}
 
-	private BigDecimal getDecimal(String key) {
-		String value = (String) json.get(key);
-		if (value == null) return null;
-		try {
-			return new BigDecimal(value);
-		} catch (NumberFormatException e) {
-			System.out.println(e);
-			return null;
-		}
+	private JSONArray getCoordinates() {
+		JSONObject geometry = JSONUtil.getJSONObject(json.get("geometry"));
+		return JSONUtil.getJSONArray(geometry.get("coordinates"));
 	}
 
 	// Getters
-	public EventID getEventID()			{return eventID;}
+	public EventID getEventID()			{return new EventID(getNet(), getCode());}
 
-	public BigDecimal getMag()			{return getDecimal("mag");}
-	public BigDecimal getCdi()			{return getDecimal("cdi");}
-	public BigDecimal getMmi()			{return getDecimal("mmi");}
-	public BigDecimal getDmin()			{return getDecimal("dmin");}
-	public BigDecimal getRms()			{return getDecimal("rms");}
-	public BigDecimal getGap()			{return getDecimal("gap");}
-	public BigDecimal getLongitude()	{return getDecimal("longitude");}
-	public BigDecimal getLatitude()		{return getDecimal("latitude");}
-	public BigDecimal getDepth()		{return getDecimal("depth");}
+	public BigDecimal getMag()			{return JSONUtil.getBigDecimal(getProperties().get("mag"));}
+	public BigDecimal getCdi()			{return JSONUtil.getBigDecimal(getProperties().get("cdi"));}
+	public BigDecimal getMmi()			{return JSONUtil.getBigDecimal(getProperties().get("mmi"));}
+	public BigDecimal getDmin()			{return JSONUtil.getBigDecimal(getProperties().get("dmin"));}
+	public BigDecimal getRms()			{return JSONUtil.getBigDecimal(getProperties().get("rms"));}
+	public BigDecimal getGap()			{return JSONUtil.getBigDecimal(getProperties().get("gap"));}
+	
+	public BigDecimal getLongitude()	{return JSONUtil.getBigDecimal(getCoordinates().get(0));}
+	public BigDecimal getLatitude()		{return JSONUtil.getBigDecimal(getCoordinates().get(1));}
+	public BigDecimal getDepth()		{return JSONUtil.getBigDecimal(getCoordinates().get(2));}
 
-	public String getPlace()			{return (String) json.get("place");}
-	public String getUrl()				{return (String) json.get("url");}
-	public String getDetail()			{return (String) json.get("detail");}
-	public String getAlert()			{return (String) json.get("alert");}
-	public String getStatus()			{return (String) json.get("status");}
-	public String getNet()				{return (String) json.get("net");}
-	public String getCode()				{return (String) json.get("code");}
-	public String getIds()				{return (String) json.get("ids");}
-	public String getSources()			{return (String) json.get("sources");}
-	public String getTypes()			{return (String) json.get("types");}
-	public String getMagType()			{return (String) json.get("magType");}
+	public String getPlace()			{return JSONUtil.getString(getProperties().get("place"));}
+	public String getUrl()				{return JSONUtil.getString(getProperties().get("url"));}
+	public String getDetail()			{return JSONUtil.getString(getProperties().get("detail"));}
+	public String getAlert()			{return JSONUtil.getString(getProperties().get("alert"));}
+	public String getStatus()			{return JSONUtil.getString(getProperties().get("status"));}
+	public String getNet()				{return JSONUtil.getString(getProperties().get("net"));}
+	public String getCode()				{return JSONUtil.getString(getProperties().get("code"));}
+	public String getIds()				{return JSONUtil.getString(getProperties().get("ids"));}
+	public String getSources()			{return JSONUtil.getString(getProperties().get("sources"));}
+	public String getTypes()			{return JSONUtil.getString(getProperties().get("types"));}
+	public String getMagType()			{return JSONUtil.getString(getProperties().get("magType"));}
 
-	public Integer getTime()			{return getInteger("time");}
-	public Integer getUpdated()			{return getInteger("updated");}
-	public Integer getTz()				{return getInteger("tz");}
-	public Integer getFelt()			{return getInteger("felt");}
-	public Integer getTsunami()			{return getInteger("tsunami");}
-	public Integer getSig()				{return getInteger("sig");}
-	public Integer getNst()				{return getInteger("nst");}
+	public Date getTime()				{return JSONUtil.getDate(getProperties().get("time"));}
+	public Date getUpdated()			{return JSONUtil.getDate(getProperties().get("updated"));}
+
+	public Integer getTz()				{return JSONUtil.getInteger(getProperties().get("tz"));}
+	public Integer getFelt()			{return JSONUtil.getInteger(getProperties().get("felt"));}
+	public Integer getTsunami()			{return JSONUtil.getInteger(getProperties().get("tsunami"));}
+	public Integer getSig()				{return JSONUtil.getInteger(getProperties().get("sig"));}
+	public Integer getNst()				{return JSONUtil.getInteger(getProperties().get("nst"));}
 }

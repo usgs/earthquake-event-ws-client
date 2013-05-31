@@ -4,6 +4,7 @@ public enum ReviewStatus {
 
 	ALL			("all"),
 	AUTOMATIC	("automatic"),
+	PUBLISHED	("published"),
 	REVIEWED	("reviewed");
 
 	private String _name;
