@@ -3,8 +3,9 @@ package gov.usgs.earthquake.event;
 public enum ReviewStatus {
 
 	ALL			("all"),
-	AUTOMATIC	("automatic"),
-	REVIEWED	("reviewed");
+	AUTOMATIC	("AUTOMATIC"),
+	PUBLISHED	("PUBLISHED"),
+	REVIEWED	("REVIEWED");
 
 	private String _name;
 
