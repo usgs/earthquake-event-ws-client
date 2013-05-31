@@ -22,12 +22,6 @@ public class JSONEvent {
 		this.json = new JSONObject(json);
 	}
 
-	private Date getTime(String key) {
-		Long value = JSONUtil.getLong(getProperties().get(key));
-		if (value == null) return null;
-		return new Date(value);
-	}
-
 	private JSONObject getProperties() {
 		return JSONUtil.getJSONObject(json.get("properties"));
 	}
@@ -63,8 +57,8 @@ public class JSONEvent {
 	public String getTypes()			{return JSONUtil.getString(getProperties().get("types"));}
 	public String getMagType()			{return JSONUtil.getString(getProperties().get("magType"));}
 
-	public Date getTime()				{return getTime("time");}
-	public Date getUpdated()			{return getTime("updated");}
+	public Date getTime()				{return JSONUtil.getDate(getProperties().get("time"));}
+	public Date getUpdated()			{return JSONUtil.getDate(getProperties().get("updated"));}
 
 	public Integer getTz()				{return JSONUtil.getInteger(getProperties().get("tz"));}
 	public Integer getFelt()			{return JSONUtil.getInteger(getProperties().get("felt"));}
