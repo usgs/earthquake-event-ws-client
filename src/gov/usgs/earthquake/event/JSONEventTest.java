@@ -22,8 +22,8 @@ public class JSONEventTest {
 				"time\":1368305217500,\"" +
 				"updated\":1369489291000,\"" +
 				"tz\":-720,\"" +
-				"url\":\"http://ehpd-earthquake.cr.usgs.gov/earthquakes/eventpage/usc000gudx\",\"" +
-				"detail\":\"http://ehpd-earthquake.cr.usgs.gov/earthquakes/feed/v1.0/detail/usc000gudx.geojson\",\"" +
+				"url\":\"http://earthquake.usgs.gov/earthquakes/eventpage/usc000gudx\",\"" +
+				"detail\":\"http://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/usc000gudx.geojson\",\"" +
 				"felt\":2,\"" +
 				"cdi\":4.1,\"" +
 				"mmi\":4.09,\"" +
@@ -109,12 +109,12 @@ public class JSONEventTest {
 
 	@Test
 	public void testUrl() {
-		Assert.assertEquals("http://ehpd-earthquake.cr.usgs.gov/earthquakes/eventpage/usc000gudx", event.getUrl());
+		Assert.assertEquals("http://earthquake.usgs.gov/earthquakes/eventpage/usc000gudx", event.getUrl());
 	}
 
 	@Test
 	public void testDetail() {
-		Assert.assertEquals("http://ehpd-earthquake.cr.usgs.gov/earthquakes/feed/v1.0/detail/usc000gudx.geojson", event.getDetail());
+		Assert.assertEquals("http://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/usc000gudx.geojson", event.getDetail());
 	}
 
 	@Test
@@ -124,7 +124,7 @@ public class JSONEventTest {
 
 	@Test
 	public void testStatus() {
-		Assert.assertEquals("REVIEWED", event.getStatus());
+		Assert.assertEquals("reviewed", event.getStatus().toLowerCase());
 	}
 
 	@Test
