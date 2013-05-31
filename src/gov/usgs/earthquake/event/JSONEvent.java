@@ -1,6 +1,7 @@
 package gov.usgs.earthquake.event;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import org.json.simple.JSONObject;
 
@@ -42,6 +43,13 @@ public class JSONEvent {
 		}
 	}
 
+	private Date getTime(String key) {
+		String value = (String) json.get(key);
+		if (value == null) return null;
+		long time = new BigDecimal(value).longValue();
+		return new Date(time);
+	}
+
 	// Getters
 	public EventID getEventID()			{return eventID;}
 
@@ -67,8 +75,9 @@ public class JSONEvent {
 	public String getTypes()			{return (String) json.get("types");}
 	public String getMagType()			{return (String) json.get("magType");}
 
-	public Integer getTime()			{return getInteger("time");}
-	public Integer getUpdated()			{return getInteger("updated");}
+	public Date getTime()				{return getTime("time");}
+	public Date getUpdated()			{return getTime("updated");}
+
 	public Integer getTz()				{return getInteger("tz");}
 	public Integer getFelt()			{return getInteger("felt");}
 	public Integer getTsunami()			{return getInteger("tsunami");}
