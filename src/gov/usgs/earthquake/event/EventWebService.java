@@ -138,25 +138,41 @@ public class EventWebService {
 		JSONParser parser = new JSONParser();
 
 		// parse feature collection into objects
-		JSONObject collection = JSONUtil.getJSONObject(parser
+		JSONObject feed = JSONUtil.getJSONObject(parser
 				.parse(new InputStreamReader(input)));
-		if (collection == null) {
-			throw new Exception("Expected feature collection");
-		}
-		JSONArray features = JSONUtil.getJSONArray(collection.get("features"));
-		if (features == null) {
-			throw new Exception("Expected features");
+		if (feed == null) {
+			throw new Exception("Expected feed object");
 		}
 
-		// parse features into eventss
-		ArrayList<JSONEvent> events = new ArrayList<JSONEvent>(features.size());
-		Iterator<?> iter = features.iterator();
-		while (iter.hasNext()) {
-			JSONObject next = JSONUtil.getJSONObject(iter.next());
-			if (next == null) {
-				throw new Exception("Expected feature");
+		// check feed type
+		String type = JSONUtil.getString(feed.get("type"));
+		if (type == null) {
+			throw new Exception("Expected geojson type");
+		}
+
+		ArrayList<JSONEvent> events = new ArrayList<JSONEvent>();
+
+		if (type.equals("Feature")) {
+			// detail feed with one event
+
+			events.add(new JSONEvent(feed));
+		} else if (type.equals("FeatureCollection")) {
+			// summary feed with many events
+
+			JSONArray features = JSONUtil.getJSONArray(feed.get("features"));
+			if (features == null) {
+				throw new Exception("Expected features");
 			}
-			events.add(new JSONEvent(next));
+
+			// parse features into events
+			Iterator<?> iter = features.iterator();
+			while (iter.hasNext()) {
+				JSONObject next = JSONUtil.getJSONObject(iter.next());
+				if (next == null) {
+					throw new Exception("Expected feature");
+				}
+				events.add(new JSONEvent(next));
+			}
 		}
 
 		return events;
