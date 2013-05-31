@@ -179,21 +179,21 @@ public class EventQueryTest {
 
 	@Test
 	public void testLimit() {
-		int test = 1;
+		Integer test = 1;
 		query.setLimit(test);
 		Assert.assertEquals(test, query.getLimit());
 	}
 
 	@Test
 	public void testOffset() {
-		int test = 1;
+		Integer test = 1;
 		query.setOffset(test);
 		Assert.assertEquals(test, query.getOffset());
 	}
 
 	@Test
 	public void testMinFelt() {
-		int test = 1;
+		Integer test = 1;
 		query.setMinFelt(test);
 		Assert.assertEquals(test, query.getMinFelt());
 	}

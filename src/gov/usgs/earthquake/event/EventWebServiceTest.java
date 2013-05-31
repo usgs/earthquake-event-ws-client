@@ -1,8 +1,11 @@
 package gov.usgs.earthquake.event;
 
+import java.math.BigDecimal;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -30,8 +33,16 @@ public class EventWebServiceTest {
 	@Test
 	public void testRequest() throws Exception {
 		EventWebService service = new EventWebService(SERVICE_URL);
-		List<JSONEvent> events = service.getEvents(null);
-		System.err.println(events.size());
+
+		EventQuery query = new EventQuery();
+		// past day
+		query.setStartTime(new Date(new Date().getTime() - 24 * 60 * 60 * 1000));
+		// M2.5+
+		query.setMinMagnitude(new BigDecimal("2.5"));
+
+		List<JSONEvent> events = service.getEvents(query);
+		System.err.println(events.size() + " M2.5+ events, past day");
+		Assert.assertTrue("events in past day", events.size() > 0);
 	}
 
 }

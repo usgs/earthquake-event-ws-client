@@ -87,9 +87,9 @@ public class EventQuery {
 	public BigDecimal getMinSig()			{return minSig;}
 	public BigDecimal getMaxSig()			{return maxSig;}
 
-	public int getLimit()					{return limit;}
-	public int getOffset()					{return offset;}
-	public int getMinFelt()					{return minFelt;}
+	public Integer getLimit()				{return limit;}
+	public Integer getOffset()				{return offset;}
+	public Integer getMinFelt()				{return minFelt;}
 
 	public String getMagnitudeType()		{return magnitudeType;}
 	public String getEventId()				{return eventId;}
@@ -98,10 +98,10 @@ public class EventQuery {
 	public String getContributor()			{return contributor;}
 	public String getProductType()			{return productType;}
 
-	public boolean getIncludeAllOrigins()	{return includeAllOrigins;}
-	public boolean getIncludeAllMagnitudes(){return includeAllMagnitudes;}
-	public boolean getIncludeArrivals()		{return includeArrivals;}
-	public boolean getKmlAnimated()			{return kmlAnimated;}
+	public Boolean getIncludeAllOrigins()	{return includeAllOrigins;}
+	public Boolean getIncludeAllMagnitudes(){return includeAllMagnitudes;}
+	public Boolean getIncludeArrivals()		{return includeArrivals;}
+	public Boolean getKmlAnimated()			{return kmlAnimated;}
 
 	public OrderBy getOrderBy()				{return orderBy;}
 	public Format getFormat()				{return format;}

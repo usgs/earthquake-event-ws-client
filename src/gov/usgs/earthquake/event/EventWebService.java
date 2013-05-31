@@ -6,7 +6,10 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -19,6 +22,10 @@ import org.json.simple.parser.JSONParser;
  * A wrapper around the Event Web Service.
  */
 public class EventWebService {
+
+	/** ISO8601 date formatting object. */
+	SimpleDateFormat ISO8601_FORMAT = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
 	/** Base URL to the event web service. */
 	private final URL serviceURL;
@@ -45,7 +52,53 @@ public class EventWebService {
 	 */
 	public URL getURL(final EventQuery query, final Format format)
 			throws MalformedURLException {
-		return new URL(serviceURL, "query?starttime=-1%20days&format=geojson");
+
+		// fill hashmap with parameters
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("alertlevel", query.getAlertLevel());
+		params.put("catalog", query.getCatalog());
+		params.put("contributor", query.getContributor());
+		params.put("endtime", getISO8601Date(query.getEndTime()));
+		params.put("eventid", query.getEventId());
+		params.put("eventtype", query.getEventType());
+		params.put("format", format == null ? query.getFormat() : format);
+		params.put("includeallmagnitudes", query.getIncludeAllMagnitudes());
+		params.put("includeallorigins", query.getIncludeAllOrigins());
+		params.put("includearrivals", query.getIncludeArrivals());
+		params.put("kmlanimated", query.getKmlAnimated());
+		params.put("kmlcolorby", query.getKmlColorBy());
+		params.put("latitude", query.getLatitude());
+		params.put("limit", query.getLimit());
+		params.put("longitude", query.getLongitude());
+		params.put("magnitudetype", query.getMagnitudeType());
+		params.put("maxcdi", query.getMaxCdi());
+		params.put("maxdepth", query.getMaxDepth());
+		params.put("maxgap", query.getMaxGap());
+		params.put("maxlatitude", query.getMaxLatitude());
+		params.put("maxlongitude", query.getMaxLongitude());
+		params.put("maxmagnitude", query.getMaxMagnitude());
+		params.put("maxmmi", query.getMaxMmi());
+		params.put("maxradius", query.getMaxRadius());
+		params.put("maxsig", query.getMaxSig());
+		params.put("mincdi", query.getMinCdi());
+		params.put("mindepth", query.getMinDepth());
+		params.put("minfelt", query.getMinFelt());
+		params.put("mingap", query.getMinGap());
+		params.put("minlatitude", query.getMinLatitude());
+		params.put("minlongitude", query.getMinLongitude());
+		params.put("minmagnitude", query.getMinMagnitude());
+		params.put("minmmi", query.getMinMmi());
+		params.put("minradius", query.getMinRadius());
+		params.put("minsig", query.getMinSig());
+		params.put("offset", query.getOffset());
+		params.put("orderby", query.getOrderBy());
+		params.put("producttype", query.getProductType());
+		params.put("reviewstatus", query.getReviewStatus());
+		params.put("starttime", getISO8601Date(query.getStartTime()));
+		params.put("updatedafter", getISO8601Date(query.getUpdatedAfter()));
+
+		String queryString = getQueryString(params);
+		return new URL(serviceURL, "query" + queryString);
 	}
 
 	/**
@@ -111,6 +164,20 @@ public class EventWebService {
 	}
 
 	/**
+	 * Utility method to encode a Date using ISO8601, when not null.
+	 * 
+	 * @param date
+	 *            date to encode.
+	 * @return iso8601 encoded date, or null if date is null.
+	 */
+	public String getISO8601Date(final Date date) {
+		if (date == null) {
+			return null;
+		}
+		return ISO8601_FORMAT.format(date);
+	}
+
+	/**
 	 * Open an InputStream, attempting to use gzip compression.
 	 * 
 	 * @param url
@@ -130,6 +197,35 @@ public class EventWebService {
 		}
 
 		return in;
+	}
+
+	/**
+	 * Utility method to build a query string from a map of parameters.
+	 * 
+	 * @param params
+	 *            the params, and keys with null values are omitted.
+	 * @return query string containing params.
+	 */
+	public String getQueryString(final HashMap<String, Object> params) {
+		StringBuffer buf = new StringBuffer();
+		boolean first = true;
+
+		Iterator<String> iter = params.keySet().iterator();
+		while (iter.hasNext()) {
+			String key = iter.next();
+			Object value = params.get(key);
+
+			if (value != null) {
+				if (first) {
+					buf.append("?");
+					first = false;
+				} else {
+					buf.append("&");
+				}
+				buf.append(key).append("=").append(value.toString());
+			}
+		}
+		return buf.toString();
 	}
 
 }
