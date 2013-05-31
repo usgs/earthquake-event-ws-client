@@ -23,11 +23,16 @@ public class EventID {
 		return this.network + this.code;
 	}
 	
-	public Boolean equals(EventID in) {
-		return (
-			in.getNetwork().equals(network) &&
-			in.getCode().equals(code)
-		);
+	@Override
+	public boolean equals(Object in) {
+		if (in instanceof EventID) {
+			return (
+				((EventID) in).getNetwork().equalsIgnoreCase(network) &&
+				((EventID) in).getCode().equalsIgnoreCase(code)
+			);
+		} else {
+			return false;
+		}
 	}
 
 	// Getters
