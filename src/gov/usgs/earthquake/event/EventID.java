@@ -5,7 +5,8 @@ package gov.usgs.earthquake.event;
  */
 public class EventID {
 
-	private String network, code;
+	private String network = null;
+	private String code = null;
 
 	/**
 	 * Construct a new EventID from a network and code.
@@ -22,11 +23,16 @@ public class EventID {
 		return this.network + this.code;
 	}
 	
-	public boolean equals(EventID in) {
-		return (
-			in.getNetwork().equals(network) &&
-			in.getCode().equals(code)
-		);
+	@Override
+	public boolean equals(Object in) {
+		if (in instanceof EventID) {
+			return (
+				((EventID) in).getNetwork().equalsIgnoreCase(network) &&
+				((EventID) in).getCode().equalsIgnoreCase(code)
+			);
+		} else {
+			return false;
+		}
 	}
 
 	// Getters

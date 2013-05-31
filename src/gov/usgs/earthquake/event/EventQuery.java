@@ -1,50 +1,59 @@
 package gov.usgs.earthquake.event;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * Event Query class.
  */
 public class EventQuery {
 
-	private long
-		startTime, endTime,
-		updatedAfter;
+	private Date startTime = null;
+	private Date endTime = null;
+	private Date updatedAfter = null;
 
-	private BigDecimal
-		latitude, longitude,
-		minRadius, maxRadius,
-		minLatitude, maxLatitude,
-		minLongitude, maxLongitude,
-		minDepth, maxDepth,
-		minMagnitude, maxMagnitude,
-		minMmi, maxMmi,
-		minCdi, maxCdi,
-		minGap, maxGap,
-		minSig, maxSig;
+	private BigDecimal latitude = null;
+	private BigDecimal longitude = null;
+	private BigDecimal minRadius = null;
+	private BigDecimal maxRadius = null;
+	private BigDecimal minLatitude = null;
+	private BigDecimal maxLatitude = null;
+	private BigDecimal minLongitude = null;
+	private BigDecimal maxLongitude = null;
+	private BigDecimal minDepth = null;
+	private BigDecimal maxDepth = null;
+	private BigDecimal minMagnitude = null;
+	private BigDecimal maxMagnitude = null;
+	private BigDecimal minMmi = null;
+	private BigDecimal maxMmi = null;
+	private BigDecimal minCdi = null;
+	private BigDecimal maxCdi = null;
+	private BigDecimal minGap = null;
+	private BigDecimal maxGap = null;
+	private BigDecimal minSig = null;
+	private BigDecimal maxSig = null;
 
-	private int
-		limit, offset,
-		minFelt;
+	private Integer limit = null;
+	private Integer offset = null;
+	private Integer minFelt = null;
 
-	private String
-		magnitudeType,
-		eventId, eventType,
-		catalog,
-		contributor,
-		productType;
+	private String magnitudeType = null;
+	private String eventId = null;
+	private String eventType = null;
+	private String catalog = null;
+	private String contributor = null;
+	private String productType = null;
 
-	private boolean
-		includeAllOrigins,
-		includeAllMagnitudes,
-		includeArrivals,
-		kmlAnimated;
+	private Boolean includeAllOrigins = null;
+	private Boolean includeAllMagnitudes = null;
+	private Boolean includeArrivals = null;
+	private Boolean kmlAnimated = null;
 
-	private OrderBy orderBy;
-	private Format format;
-	private KmlColorBy kmlColorBy;
-	private ReviewStatus reviewStatus;
-	private AlertLevel alertLevel;
+	private OrderBy orderBy = null;
+	private Format format = null;
+	private KmlColorBy kmlColorBy = null;
+	private ReviewStatus reviewStatus = null;
+	private AlertLevel alertLevel = null;
 
 	/**
 	 * Construct a blank EventQuery.
@@ -53,9 +62,9 @@ public class EventQuery {
 	}
 
 	// Getters
-	public long getStartTime()				{return startTime;}
-	public long getEndTime()				{return endTime;}
-	public long getUpdatedAfter()			{return updatedAfter;}
+	public Date getStartTime()				{return startTime;}
+	public Date getEndTime()				{return endTime;}
+	public Date getUpdatedAfter()			{return updatedAfter;}
 
 	public BigDecimal getLatitude()			{return latitude;}
 	public BigDecimal getLongitude()		{return longitude;}
@@ -101,9 +110,9 @@ public class EventQuery {
 	public AlertLevel getAlertLevel()		{return alertLevel;}
 
 	// Setters
-	public void setStartTime(long in)			{startTime = in;}
-	public void setEndTime(long in)				{endTime = in;}
-	public void setUpdatedAfter(long in)		{updatedAfter = in;}
+	public void setStartTime(Date in)			{startTime = in;}
+	public void setEndTime(Date in)				{endTime = in;}
+	public void setUpdatedAfter(Date in)		{updatedAfter = in;}
 
 	public void setLatitude(BigDecimal in)		{latitude = in;}
 	public void setLongitude(BigDecimal in)		{longitude = in;}
@@ -126,9 +135,9 @@ public class EventQuery {
 	public void setMinSig(BigDecimal in)		{minSig = in;}
 	public void setMaxSig(BigDecimal in)		{maxSig = in;}
 
-	public void setLimit(int in)				{limit = in;}
-	public void setOffset(int in)				{offset = in;}
-	public void setMinFelt(int in)				{minFelt = in;}
+	public void setLimit(Integer in)				{limit = in;}
+	public void setOffset(Integer in)				{offset = in;}
+	public void setMinFelt(Integer in)				{minFelt = in;}
 
 	public void setMagnitudeType(String in)		{magnitudeType = in;}
 	public void setEventId(String in)			{eventId = in;}
@@ -137,10 +146,10 @@ public class EventQuery {
 	public void setContributor(String in)		{contributor = in;}
 	public void setProductType(String in)		{productType = in;}
 
-	public void setIncludeAllOrigins(boolean in){includeAllOrigins = in;}
-	public void setIncludeAllMagnitudes(boolean in){includeAllMagnitudes = in;}
-	public void setIncludeArrivals(boolean in)	{includeArrivals = in;}
-	public void setKmlAnimated(boolean in)		{kmlAnimated = in;}
+	public void setIncludeAllOrigins(Boolean in){includeAllOrigins = in;}
+	public void setIncludeAllMagnitudes(Boolean in){includeAllMagnitudes = in;}
+	public void setIncludeArrivals(Boolean in)	{includeArrivals = in;}
+	public void setKmlAnimated(Boolean in)		{kmlAnimated = in;}
 
 	public void setOrderBy(OrderBy in)			{orderBy = in;}
 	public void setFormat(Format in)			{format = in;}

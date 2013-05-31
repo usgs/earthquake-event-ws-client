@@ -1,6 +1,7 @@
 package gov.usgs.earthquake.event;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -18,22 +19,22 @@ public class EventQueryTest {
 	@Test
 	public void testStartTime() {
 		long startTime = 0x12345L;
-		query.setStartTime(startTime);
-		Assert.assertEquals(startTime, query.getStartTime());
+		query.setStartTime(new Date(startTime));
+		Assert.assertEquals(new Date(startTime), query.getStartTime());
 	}
 
 	@Test
 	public void testEndTime() {
 		long endTime = 0x23456L;
-		query.setEndTime(endTime);
-		Assert.assertEquals(endTime, query.getEndTime());
+		query.setEndTime(new Date(endTime));
+		Assert.assertEquals(new Date(endTime), query.getEndTime());
 	}
 
 	@Test
 	public void testUpdatedAfter() {
 		long updatedAfter = 0x34567L;
-		query.setUpdatedAfter(updatedAfter);
-		Assert.assertEquals(updatedAfter, query.getUpdatedAfter());
+		query.setUpdatedAfter(new Date(updatedAfter));
+		Assert.assertEquals(new Date(updatedAfter), query.getUpdatedAfter());
 	}
 
 	@Test
@@ -241,28 +242,28 @@ public class EventQueryTest {
 
 	@Test
 	public void testIncludeAllOrigins() {
-		boolean test = true;
+		Boolean test = true;
 		query.setIncludeAllOrigins(test);
 		Assert.assertEquals(test, query.getIncludeAllOrigins());
 	}
 
 	@Test
 	public void testIncludeAllMagnitudes() {
-		boolean test = true;
+		Boolean test = true;
 		query.setIncludeAllMagnitudes(test);
 		Assert.assertEquals(test, query.getIncludeAllMagnitudes());
 	}
 
 	@Test
 	public void testIncludeArrivals() {
-		boolean test = true;
+		Boolean test = true;
 		query.setIncludeArrivals(test);
 		Assert.assertEquals(test, query.getIncludeArrivals());
 	}
 
 	@Test
 	public void testKmlAnimated() {
-		boolean test = true;
+		Boolean test = true;
 		query.setKmlAnimated(test);
 		Assert.assertEquals(test, query.getKmlAnimated());
 	}
