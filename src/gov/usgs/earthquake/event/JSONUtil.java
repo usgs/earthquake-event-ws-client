@@ -42,4 +42,11 @@ public class JSONUtil {
 		return null;
 	}
 
+	public static Integer getInteger(final Object o) {
+		if (o instanceof Long) {
+			return o != null ? ((Long) o).intValue() : null;
+		}
+		return null;
+	}
+
 }
