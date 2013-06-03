@@ -33,7 +33,11 @@ public class JsonEvent {
 
 	// Getters
 	public EventId getEventId() {
-		return new EventId(getNet(), getCode());
+		try {
+			return new EventId(getNet(), getCode());
+		} catch (IllegalArgumentException iae) {
+			return null;
+		}
 	}
 
 	public BigDecimal getMag() {
