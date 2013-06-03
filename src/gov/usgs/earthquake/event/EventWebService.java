@@ -32,7 +32,7 @@ public class EventWebService {
 
 	/**
 	 * Construct an EventWebService.
-	 * 
+	 *
 	 * @param serviceURL
 	 */
 	public EventWebService(final URL serviceURL) {
@@ -42,7 +42,7 @@ public class EventWebService {
 	/**
 	 * Convert an EventQuery object into an EventWebService URL, using a specific
 	 * return format.
-	 * 
+	 *
 	 * @param query
 	 *          the query.
 	 * @param format
@@ -103,7 +103,7 @@ public class EventWebService {
 
 	/**
 	 * Request events from the event web service.
-	 * 
+	 *
 	 * @param query
 	 *          query describing events to return.
 	 * @return list of events.
@@ -126,7 +126,7 @@ public class EventWebService {
 	/**
 	 * Parse the response from event web service into an array of JSONEvent
 	 * objects.
-	 * 
+	 *
 	 * @param input
 	 *          input stream response from event web service.
 	 * @return list of parsed events
@@ -181,7 +181,7 @@ public class EventWebService {
 
 	/**
 	 * Utility method to encode a Date using ISO8601, when not null.
-	 * 
+	 *
 	 * @param date
 	 *          date to encode.
 	 * @return iso8601 encoded date, or null if date is null.

@@ -36,8 +36,8 @@ public class EventWebServiceTest {
 		query.setStartTime(new Date(new Date().getTime() - 24 * 60 * 60 * 1000));
 		// M2.5+
 		query.setMinMagnitude(new BigDecimal("2.5"));
-		Assert.assertEquals("query url matches", 
-				service.getUrl(query, Format.GEOJSON), 
+		Assert.assertEquals("query url matches",
+				service.getUrl(query, Format.GEOJSON),
 				new URL("http://comcat.cr.usgs.gov/fdsnws/event/1/query?"
 						+ "minmagnitude=2.5"
 						+ "&starttime=" + service.getIso8601Date(query.getStartTime())
@@ -46,7 +46,7 @@ public class EventWebServiceTest {
 
 	/**
 	 * Make a request to the EventWebService.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -59,7 +59,7 @@ public class EventWebServiceTest {
 
 	/**
 	 * Make a request for one event.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -68,7 +68,7 @@ public class EventWebServiceTest {
 		List<JsonEvent> events = service.parseJsonEventCollection(
 				new FileInputStream(new File("etc/geojson_testdata/detail.geojson")));
 		Assert.assertEquals("1 event in detail feed", 1, events.size());
-		Assert.assertEquals("event id is 'usb000hc6w'", "usb000hc6w", 
+		Assert.assertEquals("event id is 'usb000hc6w'", "usb000hc6w",
 				events.get(0).getEventId().toString());
 	}
 
@@ -78,7 +78,7 @@ public class EventWebServiceTest {
 	 * This method is no longer marked as a junit test because it requires an
 	 * internet connection, however it is left as a potentially useful example of
 	 * how to request another web-service format.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public void testQuakeml() throws Exception {
@@ -91,7 +91,7 @@ public class EventWebServiceTest {
 		query.setMinMagnitude(new BigDecimal("2.5"));
 		query.setFormat(Format.QUAKEML);
 
-		InputStream quakeml = service.getInputStream(service.getUrl(query, null));
+		InputStream quakeml = UrlUtil.getInputStream(service.getUrl(query, null));
 		try {
 			int read = 0;
 			byte[] buf = new byte[1024];

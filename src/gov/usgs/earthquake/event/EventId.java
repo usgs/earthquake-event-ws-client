@@ -10,7 +10,7 @@ public class EventId {
 
 	/**
 	 * Construct a new EventID from a network and code.
-	 * 
+	 *
 	 * @param [String] network
 	 * @param [String] code
 	 */
@@ -26,7 +26,7 @@ public class EventId {
 	@Override
 	public boolean equals(Object in) {
 		if (in instanceof EventId) {
-			return (((EventId) in).getNetwork().equalsIgnoreCase(network) 
+			return (((EventId) in).getNetwork().equalsIgnoreCase(network)
 					&& ((EventId) in).getCode().equalsIgnoreCase(code));
 		} else {
 			return false;

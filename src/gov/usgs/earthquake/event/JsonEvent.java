@@ -15,7 +15,7 @@ public class JsonEvent {
 
 	/**
 	 * Construct a new JSONEvent from an existing json object.
-	 * 
+	 *
 	 * @param json
 	 */
 	public JsonEvent(JSONObject json) {
