@@ -302,4 +302,5 @@ public class EventQueryTest {
 		Assert.assertEquals(AlertLevel.RED, query.getAlertLevel());
 		Assert.assertEquals("red", AlertLevel.RED.toString());
 	}
+
 }

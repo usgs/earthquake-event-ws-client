@@ -62,98 +62,333 @@ public class EventQuery {
 	}
 
 	// Getters
-	public Date getStartTime()				{return startTime;}
-	public Date getEndTime()				{return endTime;}
-	public Date getUpdatedAfter()			{return updatedAfter;}
+	public Date getStartTime() {
+		return startTime;
+	}
 
-	public BigDecimal getLatitude()			{return latitude;}
-	public BigDecimal getLongitude()		{return longitude;}
-	public BigDecimal getMinRadius()		{return minRadius;}
-	public BigDecimal getMaxRadius()		{return maxRadius;}
-	public BigDecimal getMinLatitude()		{return minLatitude;}
-	public BigDecimal getMaxLatitude()		{return maxLatitude;}
-	public BigDecimal getMinLongitude()		{return minLongitude;}
-	public BigDecimal getMaxLongitude()		{return maxLongitude;}
-	public BigDecimal getMinDepth()			{return minDepth;}
-	public BigDecimal getMaxDepth()			{return maxDepth;}
-	public BigDecimal getMinMagnitude()		{return minMagnitude;}
-	public BigDecimal getMaxMagnitude()		{return maxMagnitude;}
-	public BigDecimal getMinMmi()			{return minMmi;}
-	public BigDecimal getMaxMmi()			{return maxMmi;}
-	public BigDecimal getMinCdi()			{return minCdi;}
-	public BigDecimal getMaxCdi()			{return maxCdi;}
-	public BigDecimal getMinGap()			{return minGap;}
-	public BigDecimal getMaxGap()			{return maxGap;}
-	public BigDecimal getMinSig()			{return minSig;}
-	public BigDecimal getMaxSig()			{return maxSig;}
+	public Date getEndTime() {
+		return endTime;
+	}
 
-	public Integer getLimit()				{return limit;}
-	public Integer getOffset()				{return offset;}
-	public Integer getMinFelt()				{return minFelt;}
+	public Date getUpdatedAfter() {
+		return updatedAfter;
+	}
 
-	public String getMagnitudeType()		{return magnitudeType;}
-	public String getEventId()				{return eventId;}
-	public String getEventType()			{return eventType;}
-	public String getCatalog()				{return catalog;}
-	public String getContributor()			{return contributor;}
-	public String getProductType()			{return productType;}
+	public BigDecimal getLatitude() {
+		return latitude;
+	}
 
-	public Boolean getIncludeAllOrigins()	{return includeAllOrigins;}
-	public Boolean getIncludeAllMagnitudes(){return includeAllMagnitudes;}
-	public Boolean getIncludeArrivals()		{return includeArrivals;}
-	public Boolean getKmlAnimated()			{return kmlAnimated;}
+	public BigDecimal getLongitude() {
+		return longitude;
+	}
 
-	public OrderBy getOrderBy()				{return orderBy;}
-	public Format getFormat()				{return format;}
-	public KmlColorBy getKmlColorBy()		{return kmlColorBy;}
-	public ReviewStatus getReviewStatus()	{return reviewStatus;}
-	public AlertLevel getAlertLevel()		{return alertLevel;}
+	public BigDecimal getMinRadius() {
+		return minRadius;
+	}
+
+	public BigDecimal getMaxRadius() {
+		return maxRadius;
+	}
+
+	public BigDecimal getMinLatitude() {
+		return minLatitude;
+	}
+
+	public BigDecimal getMaxLatitude() {
+		return maxLatitude;
+	}
+
+	public BigDecimal getMinLongitude() {
+		return minLongitude;
+	}
+
+	public BigDecimal getMaxLongitude() {
+		return maxLongitude;
+	}
+
+	public BigDecimal getMinDepth() {
+		return minDepth;
+	}
+
+	public BigDecimal getMaxDepth() {
+		return maxDepth;
+	}
+
+	public BigDecimal getMinMagnitude() {
+		return minMagnitude;
+	}
+
+	public BigDecimal getMaxMagnitude() {
+		return maxMagnitude;
+	}
+
+	public BigDecimal getMinMmi() {
+		return minMmi;
+	}
+
+	public BigDecimal getMaxMmi() {
+		return maxMmi;
+	}
+
+	public BigDecimal getMinCdi() {
+		return minCdi;
+	}
+
+	public BigDecimal getMaxCdi() {
+		return maxCdi;
+	}
+
+	public BigDecimal getMinGap() {
+		return minGap;
+	}
+
+	public BigDecimal getMaxGap() {
+		return maxGap;
+	}
+
+	public BigDecimal getMinSig() {
+		return minSig;
+	}
+
+	public BigDecimal getMaxSig() {
+		return maxSig;
+	}
+
+	public Integer getLimit() {
+		return limit;
+	}
+
+	public Integer getOffset() {
+		return offset;
+	}
+
+	public Integer getMinFelt() {
+		return minFelt;
+	}
+
+	public String getMagnitudeType() {
+		return magnitudeType;
+	}
+
+	public String getEventId() {
+		return eventId;
+	}
+
+	public String getEventType() {
+		return eventType;
+	}
+
+	public String getCatalog() {
+		return catalog;
+	}
+
+	public String getContributor() {
+		return contributor;
+	}
+
+	public String getProductType() {
+		return productType;
+	}
+
+	public Boolean getIncludeAllOrigins() {
+		return includeAllOrigins;
+	}
+
+	public Boolean getIncludeAllMagnitudes() {
+		return includeAllMagnitudes;
+	}
+
+	public Boolean getIncludeArrivals() {
+		return includeArrivals;
+	}
+
+	public Boolean getKmlAnimated() {
+		return kmlAnimated;
+	}
+
+	public OrderBy getOrderBy() {
+		return orderBy;
+	}
+
+	public Format getFormat() {
+		return format;
+	}
+
+	public KmlColorBy getKmlColorBy() {
+		return kmlColorBy;
+	}
+
+	public ReviewStatus getReviewStatus() {
+		return reviewStatus;
+	}
+
+	public AlertLevel getAlertLevel() {
+		return alertLevel;
+	}
 
 	// Setters
-	public void setStartTime(Date in)			{startTime = in;}
-	public void setEndTime(Date in)				{endTime = in;}
-	public void setUpdatedAfter(Date in)		{updatedAfter = in;}
+	public void setStartTime(Date in) {
+		startTime = in;
+	}
 
-	public void setLatitude(BigDecimal in)		{latitude = in;}
-	public void setLongitude(BigDecimal in)		{longitude = in;}
-	public void setMinRadius(BigDecimal in)		{minRadius = in;}
-	public void setMaxRadius(BigDecimal in)		{maxRadius = in;}
-	public void setMinLatitude(BigDecimal in)	{minLatitude = in;}
-	public void setMaxLatitude(BigDecimal in)	{maxLatitude = in;}
-	public void setMinLongitude(BigDecimal in)	{minLongitude = in;}
-	public void setMaxLongitude(BigDecimal in)	{maxLongitude = in;}
-	public void setMinDepth(BigDecimal in)		{minDepth = in;}
-	public void setMaxDepth(BigDecimal in)		{maxDepth = in;}
-	public void setMinMagnitude(BigDecimal in)	{minMagnitude = in;}
-	public void setMaxMagnitude(BigDecimal in)	{maxMagnitude = in;}
-	public void setMinMmi(BigDecimal in)		{minMmi = in;}
-	public void setMaxMmi(BigDecimal in)		{maxMmi = in;}
-	public void setMinCdi(BigDecimal in)		{minCdi = in;}
-	public void setMaxCdi(BigDecimal in)		{maxCdi = in;}
-	public void setMinGap(BigDecimal in)		{minGap = in;}
-	public void setMaxGap(BigDecimal in)		{maxGap = in;}
-	public void setMinSig(BigDecimal in)		{minSig = in;}
-	public void setMaxSig(BigDecimal in)		{maxSig = in;}
+	public void setEndTime(Date in) {
+		endTime = in;
+	}
 
-	public void setLimit(Integer in)				{limit = in;}
-	public void setOffset(Integer in)				{offset = in;}
-	public void setMinFelt(Integer in)				{minFelt = in;}
+	public void setUpdatedAfter(Date in) {
+		updatedAfter = in;
+	}
 
-	public void setMagnitudeType(String in)		{magnitudeType = in;}
-	public void setEventId(String in)			{eventId = in;}
-	public void setEventType(String in)			{eventType = in;}
-	public void setCatalog(String in)			{catalog = in;}
-	public void setContributor(String in)		{contributor = in;}
-	public void setProductType(String in)		{productType = in;}
+	public void setLatitude(BigDecimal in) {
+		latitude = in;
+	}
 
-	public void setIncludeAllOrigins(Boolean in){includeAllOrigins = in;}
-	public void setIncludeAllMagnitudes(Boolean in){includeAllMagnitudes = in;}
-	public void setIncludeArrivals(Boolean in)	{includeArrivals = in;}
-	public void setKmlAnimated(Boolean in)		{kmlAnimated = in;}
+	public void setLongitude(BigDecimal in) {
+		longitude = in;
+	}
 
-	public void setOrderBy(OrderBy in)			{orderBy = in;}
-	public void setFormat(Format in)			{format = in;}
-	public void setKmlColorBy(KmlColorBy in)	{kmlColorBy = in;}
-	public void setReviewStatus(ReviewStatus in){reviewStatus = in;}
-	public void setAlertLevel(AlertLevel in)	{alertLevel = in;}
+	public void setMinRadius(BigDecimal in) {
+		minRadius = in;
+	}
+
+	public void setMaxRadius(BigDecimal in) {
+		maxRadius = in;
+	}
+
+	public void setMinLatitude(BigDecimal in) {
+		minLatitude = in;
+	}
+
+	public void setMaxLatitude(BigDecimal in) {
+		maxLatitude = in;
+	}
+
+	public void setMinLongitude(BigDecimal in) {
+		minLongitude = in;
+	}
+
+	public void setMaxLongitude(BigDecimal in) {
+		maxLongitude = in;
+	}
+
+	public void setMinDepth(BigDecimal in) {
+		minDepth = in;
+	}
+
+	public void setMaxDepth(BigDecimal in) {
+		maxDepth = in;
+	}
+
+	public void setMinMagnitude(BigDecimal in) {
+		minMagnitude = in;
+	}
+
+	public void setMaxMagnitude(BigDecimal in) {
+		maxMagnitude = in;
+	}
+
+	public void setMinMmi(BigDecimal in) {
+		minMmi = in;
+	}
+
+	public void setMaxMmi(BigDecimal in) {
+		maxMmi = in;
+	}
+
+	public void setMinCdi(BigDecimal in) {
+		minCdi = in;
+	}
+
+	public void setMaxCdi(BigDecimal in) {
+		maxCdi = in;
+	}
+
+	public void setMinGap(BigDecimal in) {
+		minGap = in;
+	}
+
+	public void setMaxGap(BigDecimal in) {
+		maxGap = in;
+	}
+
+	public void setMinSig(BigDecimal in) {
+		minSig = in;
+	}
+
+	public void setMaxSig(BigDecimal in) {
+		maxSig = in;
+	}
+
+	public void setLimit(Integer in) {
+		limit = in;
+	}
+
+	public void setOffset(Integer in) {
+		offset = in;
+	}
+
+	public void setMinFelt(Integer in) {
+		minFelt = in;
+	}
+
+	public void setMagnitudeType(String in) {
+		magnitudeType = in;
+	}
+
+	public void setEventId(String in) {
+		eventId = in;
+	}
+
+	public void setEventType(String in) {
+		eventType = in;
+	}
+
+	public void setCatalog(String in) {
+		catalog = in;
+	}
+
+	public void setContributor(String in) {
+		contributor = in;
+	}
+
+	public void setProductType(String in) {
+		productType = in;
+	}
+
+	public void setIncludeAllOrigins(Boolean in) {
+		includeAllOrigins = in;
+	}
+
+	public void setIncludeAllMagnitudes(Boolean in) {
+		includeAllMagnitudes = in;
+	}
+
+	public void setIncludeArrivals(Boolean in) {
+		includeArrivals = in;
+	}
+
+	public void setKmlAnimated(Boolean in) {
+		kmlAnimated = in;
+	}
+
+	public void setOrderBy(OrderBy in) {
+		orderBy = in;
+	}
+
+	public void setFormat(Format in) {
+		format = in;
+	}
+
+	public void setKmlColorBy(KmlColorBy in) {
+		kmlColorBy = in;
+	}
+
+	public void setReviewStatus(ReviewStatus in) {
+		reviewStatus = in;
+	}
+
+	public void setAlertLevel(AlertLevel in) {
+		alertLevel = in;
+	}
+
 }

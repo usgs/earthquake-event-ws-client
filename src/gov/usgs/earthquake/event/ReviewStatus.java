@@ -2,10 +2,10 @@ package gov.usgs.earthquake.event;
 
 public enum ReviewStatus {
 
-	ALL			("all"),
-	AUTOMATIC	("automatic"),
-	PUBLISHED	("published"),
-	REVIEWED	("reviewed");
+	ALL("all"),
+	AUTOMATIC("automatic"),
+	PUBLISHED("published"),
+	REVIEWED("reviewed");
 
 	private String _name;
 
@@ -16,4 +16,5 @@ public enum ReviewStatus {
 	public String toString() {
 		return _name;
 	}
+
 }
