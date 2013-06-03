@@ -92,7 +92,7 @@ public class JsonUtil {
 		if (o instanceof Integer) {
 			return (Integer) o;
 		} else if (o instanceof Long) {
-			return o != null ? ((Long) o).intValue() : null;
+			return new Integer(((Long) o).intValue());
 		}
 		return null;
 	}
