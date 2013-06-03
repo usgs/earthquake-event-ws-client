@@ -5,6 +5,10 @@ import java.util.Date;
 
 /**
  * Event Query class.
+ *
+ * Represents search parameters available for the earthquake event webservice.
+ * See <a href="http://comcat.cr.usgs.gov/fdsnws/event/1/"
+ * >http://comcat.cr.usgs.gov/fdsnws/event/1/</a> for additional documentation.
  */
 public class EventQuery {
 
