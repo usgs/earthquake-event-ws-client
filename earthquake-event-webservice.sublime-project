@@ -1,0 +1,47 @@
+{
+	"folders": [
+		{
+			"path": ".",
+			"folder_exclude_patterns": [
+				".settings",
+				"instrumented"
+			],
+			"file_exclude_patterns": [
+				".classpath",
+				".project",
+				"cobertura.ser",
+				"earthquake-event-webservice.sublime-project",
+				"earthquake-event-webservice.sublime-workspace",
+				"junit*.properties"
+			]
+		}
+	],
+	"settings": {
+		"ensure_newline_at_eof_on_save": true,
+		"rulers": [80],
+		"tab_size": 2,
+		"trim_trailing_white_space_on_save": true,
+		"translate_tabs_to_spaces": false,
+		"auto_indent": true,
+		"smart_indent": true,
+		"indent_to_bracket": false,
+		"trim_automatic_white_space": true
+	},
+	"build_systems": [
+		{
+			"name": "earthquake-event-webservice: all",
+			"working_dir": "${project_path}",
+			"cmd": ["ant", "all"]
+		},
+		{
+			"name": "earthquake-event-webservice: clean",
+			"working_dir": "${project_path}",
+			"cmd": ["ant", "clean"]
+		},
+		{
+			"name": "earthquake-event-webservice: compile",
+			"working_dir": "${project_path}",
+			"cmd": ["ant", "compile"]
+		}
+	]
+}
