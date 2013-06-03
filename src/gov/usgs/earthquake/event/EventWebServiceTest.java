@@ -36,10 +36,12 @@ public class EventWebServiceTest {
 		query.setStartTime(new Date(new Date().getTime() - 24 * 60 * 60 * 1000));
 		// M2.5+
 		query.setMinMagnitude(new BigDecimal("2.5"));
-		Assert.assertEquals("query url matches", service.getUrl(query, Format.GEOJSON), 
+		Assert.assertEquals("query url matches", 
+				service.getUrl(query, Format.GEOJSON), 
 				new URL("http://comcat.cr.usgs.gov/fdsnws/event/1/query?"
-				+ "minmagnitude=2.5&starttime=" + service.getIso8601Date(query.getStartTime())
-				+ "&format=geojson"));
+						+ "minmagnitude=2.5"
+						+ "&starttime=" + service.getIso8601Date(query.getStartTime())
+						+ "&format=geojson"));
 	}
 
 	/**
@@ -66,7 +68,8 @@ public class EventWebServiceTest {
 		List<JsonEvent> events = service.parseJsonEventCollection(
 				new FileInputStream(new File("etc/geojson_testdata/detail.geojson")));
 		Assert.assertEquals("1 event in detail feed", 1, events.size());
-		Assert.assertEquals("event id is 'usb000hc6w'", "usb000hc6w", events.get(0).getEventId().toString());
+		Assert.assertEquals("event id is 'usb000hc6w'", "usb000hc6w", 
+				events.get(0).getEventId().toString());
 	}
 
 	/**

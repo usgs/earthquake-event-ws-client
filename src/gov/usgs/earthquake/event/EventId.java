@@ -26,8 +26,8 @@ public class EventId {
 	@Override
 	public boolean equals(Object in) {
 		if (in instanceof EventId) {
-			return (((EventId) in).getNetwork().equalsIgnoreCase(network) && ((EventId) in)
-					.getCode().equalsIgnoreCase(code));
+			return (((EventId) in).getNetwork().equalsIgnoreCase(network) 
+					&& ((EventId) in).getCode().equalsIgnoreCase(code));
 		} else {
 			return false;
 		}
