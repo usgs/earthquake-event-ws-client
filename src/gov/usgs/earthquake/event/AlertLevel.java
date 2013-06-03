@@ -1,11 +1,12 @@
 package gov.usgs.earthquake.event;
 
 public enum AlertLevel {
-	ALL		("all"),
-	GREEN	("green"),
-	YELLOW	("yellow"),
-	ORANGE	("orange"),
-	RED		("red");
+
+	ALL("all"),
+	GREEN("green"),
+	YELLOW("yellow"),
+	ORANGE("orange"),
+	RED("red");
 
 	private String _name;
 
@@ -16,4 +17,5 @@ public enum AlertLevel {
 	public String toString() {
 		return _name;
 	}
+
 }

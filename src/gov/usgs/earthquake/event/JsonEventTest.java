@@ -10,50 +10,50 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JSONEventTest {
+public class JsonEventTest {
 
-	JSONEvent event = null;
+	JsonEvent event = null;
 
 	@Before
 	public void setup() {
-		String feature = "{\"type\":\"Feature\",\"properties\":{\"" +
-				"mag\":6.4,\"" +
-				"place\":\"140km WNW of Neiafu, Tonga\",\"" +
-				"time\":1368305217500,\"" +
-				"updated\":1369489291000,\"" +
-				"tz\":-720,\"" +
-				"url\":\"http://earthquake.usgs.gov/earthquakes/eventpage/usc000gudx\",\"" +
-				"detail\":\"http://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/usc000gudx.geojson\",\"" +
-				"felt\":2,\"" +
-				"cdi\":4.1,\"" +
-				"mmi\":4.09,\"" +
-				"alert\":\"green\",\"" +
-				"status\":\"REVIEWED\",\"" +
-				"tsunami\":null,\"" +
-				"sig\":631,\"" +
-				"net\":\"us\",\"" +
-				"code\":\"c000gudx\",\"" +
-				"ids\":\",pt13131001,at00mmnj2c,usc000gudx,\",\"" +
-				"sources\":\",pt,at,us,\",\"" +
-				"types\":\",cap,dyfi,geoserve,losspager,moment-tensor,nearby-cities,origin,p-wave-travel-times,phase-data,scitech-link,shakemap,tectonic-summary,\",\"" +
-				"nst\":520,\"" +
-				"dmin\":5.02427738,\"" +
-				"rms\":0.54,\"" +
-				"gap\":32.4,\"" +
-				"magType\":\"Mw\",\"" +
-				"type\":\"earthquake\"},\"" +
-				"geometry\":{\"type\":\"Point\",\"coordinates\":[-175.099,-17.954,212.2]},\"" +
-				"id\":\"usc000gudx\"}";
+		String feature = "{\"type\":\"Feature\",\"properties\":{\""
+				+ "mag\":6.4,\""
+				+ "place\":\"140km WNW of Neiafu, Tonga\",\""
+				+ "time\":1368305217500,\""
+				+ "updated\":1369489291000,\""
+				+ "tz\":-720,\""
+				+ "url\":\"http://earthquake.usgs.gov/earthquakes/eventpage/usc000gudx\",\""
+				+ "detail\":\"http://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/usc000gudx.geojson\",\""
+				+ "felt\":2,\""
+				+ "cdi\":4.1,\""
+				+ "mmi\":4.09,\""
+				+ "alert\":\"green\",\""
+				+ "status\":\"REVIEWED\",\""
+				+ "tsunami\":null,\""
+				+ "sig\":631,\""
+				+ "net\":\"us\",\""
+				+ "code\":\"c000gudx\",\""
+				+ "ids\":\",pt13131001,at00mmnj2c,usc000gudx,\",\""
+				+ "sources\":\",pt,at,us,\",\""
+				+ "types\":\",cap,dyfi,geoserve,losspager,moment-tensor,nearby-cities,origin,p-wave-travel-times,phase-data,scitech-link,shakemap,tectonic-summary,\",\""
+				+ "nst\":520,\""
+				+ "dmin\":5.02427738,\""
+				+ "rms\":0.54,\""
+				+ "gap\":32.4,\""
+				+ "magType\":\"Mw\",\""
+				+ "type\":\"earthquake\"},\""
+				+ "geometry\":{\"type\":\"Point\",\"coordinates\":[-175.099,-17.954,212.2]},\""
+				+ "id\":\"usc000gudx\"}";
 		Object obj = JSONValue.parse(feature);
-		JSONObject json = (JSONObject)obj;
-		event = new JSONEvent(json);
+		JSONObject json = (JSONObject) obj;
+		event = new JsonEvent(json);
 	}
 
 	@Test
 	public void testEventId() {
 		String network = "us";
 		String code = "c000gudx";
-		EventID id = new EventID(network, code);
+		EventId id = new EventId(network, code);
 		Assert.assertTrue(id.equals(event.getEventID()));
 	}
 
@@ -109,12 +109,17 @@ public class JSONEventTest {
 
 	@Test
 	public void testUrl() {
-		Assert.assertEquals("http://earthquake.usgs.gov/earthquakes/eventpage/usc000gudx", event.getUrl());
+		Assert.assertEquals(
+				"http://earthquake.usgs.gov/earthquakes/eventpage/usc000gudx",
+				event.getUrl());
 	}
 
 	@Test
 	public void testDetail() {
-		Assert.assertEquals("http://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/usc000gudx.geojson", event.getDetail());
+		Assert
+				.assertEquals(
+						"http://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/usc000gudx.geojson",
+						event.getDetail());
 	}
 
 	@Test
@@ -149,7 +154,10 @@ public class JSONEventTest {
 
 	@Test
 	public void testTypes() {
-		Assert.assertEquals(",cap,dyfi,geoserve,losspager,moment-tensor,nearby-cities,origin,p-wave-travel-times,phase-data,scitech-link,shakemap,tectonic-summary,", event.getTypes());
+		Assert
+				.assertEquals(
+						",cap,dyfi,geoserve,losspager,moment-tensor,nearby-cities,origin,p-wave-travel-times,phase-data,scitech-link,shakemap,tectonic-summary,",
+						event.getTypes());
 	}
 
 	@Test
@@ -191,4 +199,5 @@ public class JSONEventTest {
 	public void testNst() {
 		Assert.assertEquals(new Integer("520"), event.getNst());
 	}
+
 }

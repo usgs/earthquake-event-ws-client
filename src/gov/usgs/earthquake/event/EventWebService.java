@@ -40,13 +40,13 @@ public class EventWebService {
 	}
 
 	/**
-	 * Convert an EventQuery object into an EventWebService URL, using a
-	 * specific return format.
+	 * Convert an EventQuery object into an EventWebService URL, using a specific
+	 * return format.
 	 * 
 	 * @param query
-	 *            the query.
+	 *          the query.
 	 * @param format
-	 *            the format.
+	 *          the format.
 	 * @return a URL for query and format.
 	 * @throws MalformedURLException
 	 */
@@ -105,12 +105,12 @@ public class EventWebService {
 	 * Request events from the event web service.
 	 * 
 	 * @param query
-	 *            query describing events to return.
+	 *          query describing events to return.
 	 * @return list of events.
 	 * @throws Exception
-	 *             if any occur.
+	 *           if any occur.
 	 */
-	public List<JSONEvent> getEvents(final EventQuery query) throws Exception {
+	public List<JsonEvent> getEvents(final EventQuery query) throws Exception {
 		InputStream result = getInputStream(getURL(query, Format.GEOJSON));
 		try {
 			return parseJSONEventCollection(result);
@@ -128,38 +128,38 @@ public class EventWebService {
 	 * objects.
 	 * 
 	 * @param input
-	 *            input stream response from event web service.
+	 *          input stream response from event web service.
 	 * @return list of parsed events
 	 * @throws Exception
-	 *             if format is unexpected.
+	 *           if format is unexpected.
 	 */
-	public List<JSONEvent> parseJSONEventCollection(final InputStream input)
+	public List<JsonEvent> parseJSONEventCollection(final InputStream input)
 			throws Exception {
 		JSONParser parser = new JSONParser();
 
 		// parse feature collection into objects
-		JSONObject feed = JSONUtil.getJSONObject(parser
+		JSONObject feed = JsonUtil.getJsonObject(parser
 				.parse(new InputStreamReader(input)));
 		if (feed == null) {
 			throw new Exception("Expected feed object");
 		}
 
 		// check feed type
-		String type = JSONUtil.getString(feed.get("type"));
+		String type = JsonUtil.getString(feed.get("type"));
 		if (type == null) {
 			throw new Exception("Expected geojson type");
 		}
 
-		ArrayList<JSONEvent> events = new ArrayList<JSONEvent>();
+		ArrayList<JsonEvent> events = new ArrayList<JsonEvent>();
 
 		if (type.equals("Feature")) {
 			// detail feed with one event
 
-			events.add(new JSONEvent(feed));
+			events.add(new JsonEvent(feed));
 		} else if (type.equals("FeatureCollection")) {
 			// summary feed with many events
 
-			JSONArray features = JSONUtil.getJSONArray(feed.get("features"));
+			JSONArray features = JsonUtil.getJsonArray(feed.get("features"));
 			if (features == null) {
 				throw new Exception("Expected features");
 			}
@@ -167,11 +167,11 @@ public class EventWebService {
 			// parse features into events
 			Iterator<?> iter = features.iterator();
 			while (iter.hasNext()) {
-				JSONObject next = JSONUtil.getJSONObject(iter.next());
+				JSONObject next = JsonUtil.getJsonObject(iter.next());
 				if (next == null) {
 					throw new Exception("Expected feature");
 				}
-				events.add(new JSONEvent(next));
+				events.add(new JsonEvent(next));
 			}
 		}
 
@@ -183,7 +183,7 @@ public class EventWebService {
 	 * Utility method to encode a Date using ISO8601, when not null.
 	 * 
 	 * @param date
-	 *            date to encode.
+	 *          date to encode.
 	 * @return iso8601 encoded date, or null if date is null.
 	 */
 	public String getISO8601Date(final Date date) {
@@ -197,7 +197,7 @@ public class EventWebService {
 	 * Open an InputStream, attempting to use gzip compression.
 	 * 
 	 * @param url
-	 *            url to open
+	 *          url to open
 	 * @return opened InputStream, ready to be read.
 	 * @throws IOException
 	 */
@@ -219,7 +219,7 @@ public class EventWebService {
 	 * Utility method to build a query string from a map of parameters.
 	 * 
 	 * @param params
-	 *            the params, and keys with null values are omitted.
+	 *          the params, and keys with null values are omitted.
 	 * @return query string containing params.
 	 */
 	public String getQueryString(final HashMap<String, Object> params) {

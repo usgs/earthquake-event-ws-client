@@ -41,7 +41,7 @@ public class EventWebServiceTest {
 		// M2.5+
 		query.setMinMagnitude(new BigDecimal("2.5"));
 
-		List<JSONEvent> events = service.getEvents(query);
+		List<JsonEvent> events = service.getEvents(query);
 		Assert.assertTrue("events in past day", events.size() > 0);
 	}
 
@@ -62,7 +62,7 @@ public class EventWebServiceTest {
 		// only need 1 event
 		query.setLimit(1);
 
-		List<JSONEvent> events = service.getEvents(query);
+		List<JsonEvent> events = service.getEvents(query);
 		Assert.assertTrue("most recent event in past day", events.size() > 0);
 
 		EventQuery detailQuery = new EventQuery();
@@ -87,8 +87,7 @@ public class EventWebServiceTest {
 		query.setMinMagnitude(new BigDecimal("2.5"));
 		query.setFormat(Format.QUAKEML);
 
-		InputStream quakeml = service.getInputStream(service
-				.getURL(query, null));
+		InputStream quakeml = service.getInputStream(service.getURL(query, null));
 		try {
 			int read = 0;
 			byte[] buf = new byte[1024];
@@ -103,4 +102,5 @@ public class EventWebServiceTest {
 			}
 		}
 	}
+
 }
