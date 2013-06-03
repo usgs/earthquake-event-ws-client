@@ -2,10 +2,10 @@ package gov.usgs.earthquake.event;
 
 public enum OrderBy {
 
-	TIME			("time"),
-	TIME_ASC		("time-asc"),
-	MAGNITUDE		("magnitude"),
-	MAGNITUDE_ASC	("magnitude-asc");
+	TIME("time"),
+	TIME_ASC("time-asc"),
+	MAGNITUDE("magnitude"),
+	MAGNITUDE_ASC("magnitude-asc");
 
 	private String _name;
 
@@ -16,4 +16,5 @@ public enum OrderBy {
 	public String toString() {
 		return _name;
 	}
+
 }

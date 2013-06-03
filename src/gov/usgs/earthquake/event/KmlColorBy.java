@@ -2,8 +2,8 @@ package gov.usgs.earthquake.event;
 
 public enum KmlColorBy {
 
-	AGE		("age"),
-	DEPTH	("depth");
+	AGE("age"),
+	DEPTH("depth");
 
 	private String _name;
 
@@ -14,4 +14,5 @@ public enum KmlColorBy {
 	public String toString() {
 		return _name;
 	}
+
 }

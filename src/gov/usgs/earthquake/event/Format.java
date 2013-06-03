@@ -2,10 +2,10 @@ package gov.usgs.earthquake.event;
 
 public enum Format {
 
-	QUAKEML		("quakeml"),
-	CSV			("csv"),
-	GEOJSON		("geojson"),
-	KML			("kml");
+	QUAKEML("quakeml"),
+	CSV("csv"),
+	GEOJSON("geojson"),
+	KML("kml");
 
 	private String _name;
 
@@ -16,4 +16,5 @@ public enum Format {
 	public String toString() {
 		return _name;
 	}
+
 }
