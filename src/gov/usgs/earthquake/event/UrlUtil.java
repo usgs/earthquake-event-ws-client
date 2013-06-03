@@ -13,6 +13,8 @@ import java.util.zip.GZIPInputStream;
  */
 public class UrlUtil {
 
+	public static final String GZIP_ENCODING = "gzip";
+
 	/**
 	 * Open a URL attempting to use gzip compression.
 	 *
@@ -24,11 +26,11 @@ public class UrlUtil {
 	public static InputStream getInputStream(final URL url) throws IOException {
 		// request gzip
 		URLConnection conn = url.openConnection();
-		conn.addRequestProperty("Accept-encoding", "gzip");
+		conn.addRequestProperty("Accept-encoding", GZIP_ENCODING);
 		InputStream in = conn.getInputStream();
 
 		// ungzip response
-		if (conn.getContentEncoding().equalsIgnoreCase("gzip")) {
+		if (GZIP_ENCODING.equals(conn.getContentEncoding())) {
 			in = new GZIPInputStream(in);
 		}
 
