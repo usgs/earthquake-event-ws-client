@@ -2,6 +2,7 @@ package gov.usgs.earthquake.event;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.HashMap;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -55,6 +56,22 @@ public class JsonEventTest {
 		String code = "c000gudx";
 		EventId id = new EventId(network, code);
 		Assert.assertTrue(id.equals(event.getEventId()));
+	}
+
+	@Test
+	public void testBadEventId () {
+		HashMap<String, Object> properties_hash = new HashMap<String, Object>();
+		JSONObject properties = new JSONObject(properties_hash);
+
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("properties", properties);
+		JSONObject jsonObject = new JSONObject(params);
+
+		JsonEvent event = new JsonEvent(jsonObject);
+		EventId id = event.getEventId(); // <-- Exception
+
+		Assert.assertNull("An IllegalArgumentException should have occurred.",
+				id);
 	}
 
 	@Test
