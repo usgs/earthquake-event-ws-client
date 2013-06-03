@@ -3,3 +3,5 @@ cobertura.ser
 dist
 instrumented
 bin
+earthquake-event-webservice.sublime-workspace
+.DS_Store
