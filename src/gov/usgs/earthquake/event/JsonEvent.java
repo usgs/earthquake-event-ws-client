@@ -15,7 +15,7 @@ public class JsonEvent {
 
 	/**
 	 * Construct a new JSONEvent from an existing json object.
-	 * 
+	 *
 	 * @param json
 	 */
 	public JsonEvent(JSONObject json) {
@@ -32,7 +32,7 @@ public class JsonEvent {
 	}
 
 	// Getters
-	public EventId getEventID() {
+	public EventId getEventId() {
 		return new EventId(getNet(), getCode());
 	}
 

@@ -1,6 +1,8 @@
 package gov.usgs.earthquake.event;
 
 import java.io.InputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Date;
@@ -26,57 +28,59 @@ public class EventWebServiceTest {
 		SERVICE_URL = url;
 	}
 
-	/**
-	 * Make a request to the EventWebService.
-	 * 
-	 * @throws Exception
-	 */
 	@Test
-	public void testRequest() throws Exception {
+	public void testGetUrl() throws Exception {
 		EventWebService service = new EventWebService(SERVICE_URL);
-
 		EventQuery query = new EventQuery();
 		// past day
 		query.setStartTime(new Date(new Date().getTime() - 24 * 60 * 60 * 1000));
 		// M2.5+
 		query.setMinMagnitude(new BigDecimal("2.5"));
+		Assert.assertEquals("query url matches",
+				service.getUrl(query, Format.GEOJSON),
+				new URL("http://comcat.cr.usgs.gov/fdsnws/event/1/query?"
+						+ "minmagnitude=2.5"
+						+ "&starttime=" + service.getIso8601Date(query.getStartTime())
+						+ "&format=geojson"));
+	}
 
-		List<JsonEvent> events = service.getEvents(query);
-		Assert.assertTrue("events in past day", events.size() > 0);
+	/**
+	 * Make a request to the EventWebService.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testParseSummary() throws Exception {
+		EventWebService service = new EventWebService(SERVICE_URL);
+		List<JsonEvent> events = service.parseJsonEventCollection(
+				new FileInputStream(new File("etc/geojson_testdata/summary.geojson")));
+		Assert.assertEquals("11 events in summary feed", 11, events.size());
 	}
 
 	/**
 	 * Make a request for one event.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
-	public void testDetailRequest() throws Exception {
+	public void testParseDetail() throws Exception {
 		EventWebService service = new EventWebService(SERVICE_URL);
-
-		EventQuery query = new EventQuery();
-		// past day
-		query.setStartTime(new Date(new Date().getTime() - 24 * 60 * 60 * 1000));
-		// M2.5+
-		query.setMinMagnitude(new BigDecimal("2.5"));
-		// only need 1 event
-		query.setLimit(1);
-
-		List<JsonEvent> events = service.getEvents(query);
-		Assert.assertTrue("most recent event in past day", events.size() > 0);
-
-		EventQuery detailQuery = new EventQuery();
-		detailQuery.setEventId(events.get(0).getEventID().toString());
-		events = service.getEvents(detailQuery);
-		Assert.assertTrue("one event in detail query", events.size() == 1);
+		List<JsonEvent> events = service.parseJsonEventCollection(
+				new FileInputStream(new File("etc/geojson_testdata/detail.geojson")));
+		Assert.assertEquals("1 event in detail feed", 1, events.size());
+		Assert.assertEquals("event id is 'usb000hc6w'", "usb000hc6w",
+				events.get(0).getEventId().toString());
 	}
 
 	/**
 	 * Make a request to the EventWebService using a quakeml format.
-	 * 
+	 *
+	 * This method is no longer marked as a junit test because it requires an
+	 * internet connection, however it is left as a potentially useful example of
+	 * how to request another web-service format.
+	 *
 	 * @throws Exception
 	 */
-	@Test
 	public void testQuakeml() throws Exception {
 		EventWebService service = new EventWebService(SERVICE_URL);
 
@@ -87,7 +91,7 @@ public class EventWebServiceTest {
 		query.setMinMagnitude(new BigDecimal("2.5"));
 		query.setFormat(Format.QUAKEML);
 
-		InputStream quakeml = service.getInputStream(service.getURL(query, null));
+		InputStream quakeml = UrlUtil.getInputStream(service.getUrl(query, null));
 		try {
 			int read = 0;
 			byte[] buf = new byte[1024];

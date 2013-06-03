@@ -54,7 +54,7 @@ public class JsonEventTest {
 		String network = "us";
 		String code = "c000gudx";
 		EventId id = new EventId(network, code);
-		Assert.assertTrue(id.equals(event.getEventID()));
+		Assert.assertTrue(id.equals(event.getEventId()));
 	}
 
 	@Test
@@ -116,10 +116,9 @@ public class JsonEventTest {
 
 	@Test
 	public void testDetail() {
-		Assert
-				.assertEquals(
-						"http://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/usc000gudx.geojson",
-						event.getDetail());
+		Assert.assertEquals(
+				"http://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/usc000gudx.geojson",
+				event.getDetail());
 	}
 
 	@Test
@@ -154,10 +153,9 @@ public class JsonEventTest {
 
 	@Test
 	public void testTypes() {
-		Assert
-				.assertEquals(
-						",cap,dyfi,geoserve,losspager,moment-tensor,nearby-cities,origin,p-wave-travel-times,phase-data,scitech-link,shakemap,tectonic-summary,",
-						event.getTypes());
+		Assert.assertEquals(
+				",cap,dyfi,geoserve,losspager,moment-tensor,nearby-cities,origin,p-wave-travel-times,phase-data,scitech-link,shakemap,tectonic-summary,",
+				event.getTypes());
 	}
 
 	@Test

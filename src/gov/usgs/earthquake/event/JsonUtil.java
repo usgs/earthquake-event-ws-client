@@ -13,7 +13,7 @@ public class JsonUtil {
 
 	/**
 	 * Convert Object to JSONObject.
-	 * 
+	 *
 	 * @param o
 	 *          object to convert.
 	 * @return JSONObject, or null if not JSONObject.
@@ -27,7 +27,7 @@ public class JsonUtil {
 
 	/**
 	 * Convert Object to JSONArray.
-	 * 
+	 *
 	 * @param o
 	 *          object to convert.
 	 * @return JSONArray, or null if not JSONArray.
@@ -41,7 +41,7 @@ public class JsonUtil {
 
 	/**
 	 * Convert Object to BigDecimal.
-	 * 
+	 *
 	 * @param o
 	 *          object to convert.
 	 * @return BigDecimal, or null if not BigDecimal.
@@ -55,7 +55,7 @@ public class JsonUtil {
 
 	/**
 	 * Convert Object to String.
-	 * 
+	 *
 	 * @param o
 	 *          object to convert.
 	 * @return String, or null if not String.
@@ -69,7 +69,7 @@ public class JsonUtil {
 
 	/**
 	 * Convert Object to Long.
-	 * 
+	 *
 	 * @param o
 	 *          object to convert.
 	 * @return Long, or null if not Long.
@@ -83,7 +83,7 @@ public class JsonUtil {
 
 	/**
 	 * Convert Object to Integer.
-	 * 
+	 *
 	 * @param o
 	 *          object to convert.
 	 * @return Integer, or null if not Long or Integer.
@@ -99,7 +99,7 @@ public class JsonUtil {
 
 	/**
 	 * Convert Object to Date.
-	 * 
+	 *
 	 * @param o
 	 *          object to convert.
 	 * @return Date, or null if not Long or Date.
