@@ -74,6 +74,10 @@ public class EventWebServiceTest {
 
 	/**
 	 * Make a request to the EventWebService using a quakeml format.
+	 *
+	 * This method is no longer marked as a junit test because it requires an
+	 * internet connection, however it is left as a potentially useful example of
+	 * how to request another web-service format.
 	 * 
 	 * @throws Exception
 	 */
