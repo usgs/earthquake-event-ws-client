@@ -4,4 +4,4 @@ dist
 instrumented
 bin
 earthquake-event-webservice.sublime-workspace
-junit*.properties
+.DS_Store
