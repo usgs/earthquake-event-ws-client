@@ -50,7 +50,7 @@ public class EventWebService {
 	 * @return a URL for query and format.
 	 * @throws MalformedURLException
 	 */
-	public URL getURL(final EventQuery query, final Format format)
+	public URL getUrl(final EventQuery query, final Format format)
 			throws MalformedURLException {
 
 		// fill hashmap with parameters
@@ -58,7 +58,7 @@ public class EventWebService {
 		params.put("alertlevel", query.getAlertLevel());
 		params.put("catalog", query.getCatalog());
 		params.put("contributor", query.getContributor());
-		params.put("endtime", getISO8601Date(query.getEndTime()));
+		params.put("endtime", getIso8601Date(query.getEndTime()));
 		params.put("eventid", query.getEventId());
 		params.put("eventtype", query.getEventType());
 		params.put("format", format == null ? query.getFormat() : format);
@@ -94,8 +94,8 @@ public class EventWebService {
 		params.put("orderby", query.getOrderBy());
 		params.put("producttype", query.getProductType());
 		params.put("reviewstatus", query.getReviewStatus());
-		params.put("starttime", getISO8601Date(query.getStartTime()));
-		params.put("updatedafter", getISO8601Date(query.getUpdatedAfter()));
+		params.put("starttime", getIso8601Date(query.getStartTime()));
+		params.put("updatedafter", getIso8601Date(query.getUpdatedAfter()));
 
 		String queryString = getQueryString(params);
 		return new URL(serviceURL, "query" + queryString);
@@ -111,9 +111,9 @@ public class EventWebService {
 	 *           if any occur.
 	 */
 	public List<JsonEvent> getEvents(final EventQuery query) throws Exception {
-		InputStream result = getInputStream(getURL(query, Format.GEOJSON));
+		InputStream result = getInputStream(getUrl(query, Format.GEOJSON));
 		try {
-			return parseJSONEventCollection(result);
+			return parseJsonEventCollection(result);
 		} finally {
 			try {
 				result.close();
@@ -133,7 +133,7 @@ public class EventWebService {
 	 * @throws Exception
 	 *           if format is unexpected.
 	 */
-	public List<JsonEvent> parseJSONEventCollection(final InputStream input)
+	public List<JsonEvent> parseJsonEventCollection(final InputStream input)
 			throws Exception {
 		JSONParser parser = new JSONParser();
 
@@ -186,7 +186,7 @@ public class EventWebService {
 	 *          date to encode.
 	 * @return iso8601 encoded date, or null if date is null.
 	 */
-	public String getISO8601Date(final Date date) {
+	public String getIso8601Date(final Date date) {
 		if (date == null) {
 			return null;
 		}

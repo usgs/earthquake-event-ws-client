@@ -87,7 +87,7 @@ public class EventWebServiceTest {
 		query.setMinMagnitude(new BigDecimal("2.5"));
 		query.setFormat(Format.QUAKEML);
 
-		InputStream quakeml = service.getInputStream(service.getURL(query, null));
+		InputStream quakeml = service.getInputStream(service.getUrl(query, null));
 		try {
 			int read = 0;
 			byte[] buf = new byte[1024];

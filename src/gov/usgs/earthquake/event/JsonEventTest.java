@@ -54,7 +54,7 @@ public class JsonEventTest {
 		String network = "us";
 		String code = "c000gudx";
 		EventId id = new EventId(network, code);
-		Assert.assertTrue(id.equals(event.getEventID()));
+		Assert.assertTrue(id.equals(event.getEventId()));
 	}
 
 	@Test

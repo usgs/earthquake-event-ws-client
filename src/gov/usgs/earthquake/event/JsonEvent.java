@@ -32,7 +32,7 @@ public class JsonEvent {
 	}
 
 	// Getters
-	public EventId getEventID() {
+	public EventId getEventId() {
 		return new EventId(getNet(), getCode());
 	}
 
