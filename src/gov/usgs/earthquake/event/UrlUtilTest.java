@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.HashMap;
 
 import org.junit.Assert;
 import org.junit.Test;
