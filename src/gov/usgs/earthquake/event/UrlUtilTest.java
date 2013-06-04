@@ -2,7 +2,13 @@ package gov.usgs.earthquake.event;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.HashMap;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URL;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,6 +25,18 @@ public class UrlUtilTest {
 	public void testGetInputStream () throws Exception {
 		InputStream in = UrlUtil.getInputStream((new File(".")).toURI().toURL());
 		Assert.assertNotNull("Can get an input stream.", in);
+	}
+
+	@Test
+	public void testGetInputStream_gzip () throws Exception {
+		final int port = 9999;
+		startGzipServer(port);
+
+		URL url = new URL("http", "localhost", port, "/");
+		InputStream in = UrlUtil.getInputStream(url);
+
+		Assert.assertTrue("Got a gzip input stream.",
+				(in instanceof GZIPInputStream));
 	}
 
 	@Test
@@ -59,5 +77,29 @@ public class UrlUtilTest {
 		}
 		Assert.assertEquals("Query string contains proper number of parameters.", 1,
 				qs_param_count);
+	}
+
+
+	/**
+	 * Starts a simple server. Used to test GzipEncoding locally.
+	 */
+	private static void startGzipServer (final int port) throws Exception {
+		new Thread() {
+			public void run () {
+				ServerSocket server = null;
+				try {
+					server = new ServerSocket(port);
+					Socket request = server.accept();
+					PrintStream out = new PrintStream(request.getOutputStream());
+					out.println("HTTP/1.1 200 OK");
+					out.println("Content-Encoding: gzip");
+					out.println();
+					out.flush();
+					GZIPOutputStream gzip = new GZIPOutputStream(request.getOutputStream());
+				} catch (Exception ex) {
+					Assert.fail(ex.getMessage());
+				}
+			}
+		}.start();
 	}
 }
