@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.List;
 
@@ -132,6 +133,12 @@ public class EventWebServiceTest {
 		//       parsing section of the unit tests.
 	}
 
+	@Test(expected = Exception.class)
+	public void testGetEvents_Null () throws Exception {
+		List<JsonEvent> events = (new ExceptionEventWebService(
+				new URL("http://localhost/"))).getEvents(new EventQuery());
+	}
+
 	/**
 	 * Make a request to the EventWebService using a quakeml format.
 	 *
@@ -164,4 +171,15 @@ public class EventWebServiceTest {
 		}
 	}
 
+
+	private class ExceptionEventWebService extends EventWebService {
+		public ExceptionEventWebService (final URL url) {
+			super(url);
+		}
+
+		public URL getUrl (EventQuery query, Format format)
+				throws MalformedURLException {
+			return null;
+		}
+	}
 }

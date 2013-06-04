@@ -113,9 +113,17 @@ public class EventWebService {
 	 *           if any occur.
 	 */
 	public List<JsonEvent> getEvents(final EventQuery query) throws Exception {
-		InputStream result = UrlUtil.getInputStream(getUrl(query, Format.GEOJSON));
-		List<JsonEvent> events = parseJsonEventCollection(result);
-		result.close();
+		InputStream result = null;
+		List<JsonEvent> events = null;
+
+		try {
+			result = UrlUtil.getInputStream(getUrl(query, Format.GEOJSON));
+			events = parseJsonEventCollection(result);
+		} finally {
+			if (result != null) {
+				result.close();
+			}
+		}
 
 		return events;
 	}
