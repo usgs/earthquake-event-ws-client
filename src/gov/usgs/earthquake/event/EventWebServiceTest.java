@@ -1,47 +1,65 @@
 package gov.usgs.earthquake.event;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.Before;
 
 /**
  * Test methods for the EventWebService.
  */
 public class EventWebServiceTest {
 
-	/** Service URL for testing. */
-	static final URL SERVICE_URL;
-	static {
-		URL url = null;
-		try {
-			url = new URL("http://comcat.cr.usgs.gov/fdsnws/event/1/");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		SERVICE_URL = url;
+	private EventWebService comcat = null;
+	private EventWebService summary = null;
+	private EventWebService detail = null;
+	private EventQuery query = null;
+
+	@Before
+	public void setup () throws Exception {
+		comcat = new EventWebService(
+				new URL("http://comcat.cr.usgs.gov/fdsnws/event/1/"));
+		summary = new EventWebService(
+				(new File("etc/geojson_testdata/summary/query")).toURI().toURL());
+		detail = new EventWebService(
+				(new File("etc/geojson_testdata/detail/query")).toURI().toURL());
+
+		query = new EventQuery();
 	}
 
 	@Test
 	public void testGetUrl() throws Exception {
-		EventWebService service = new EventWebService(SERVICE_URL);
 		EventQuery query = new EventQuery();
+		URL expected = null;
+
 		// past day
 		query.setStartTime(new Date(new Date().getTime() - 24 * 60 * 60 * 1000));
 		// M2.5+
 		query.setMinMagnitude(new BigDecimal("2.5"));
-		Assert.assertEquals("query url matches",
-				service.getUrl(query, Format.GEOJSON),
-				new URL("http://comcat.cr.usgs.gov/fdsnws/event/1/query?"
-						+ "minmagnitude=2.5"
-						+ "&starttime=" + EventWebService.getIso8601Date(query.getStartTime())
-						+ "&format=geojson"));
+
+		expected = new URL(
+				"http://comcat.cr.usgs.gov/fdsnws/event/1/query?" +
+				"minmagnitude=2.5" +
+				"&starttime=" + EventWebService.getIso8601Date(query.getStartTime()) +
+				"&format=geojson");
+
+		// Test with an explicit format
+		Assert.assertEquals("query url matches (explicit format).",
+				expected, comcat.getUrl(query, Format.GEOJSON));
+
+		// Test with an implied format (from query)
+		query.setFormat(Format.GEOJSON);
+		Assert.assertEquals("query url matches (implied format).",
+				expected, comcat.getUrl(query, null));
 	}
 
 	/**
@@ -50,26 +68,75 @@ public class EventWebServiceTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void testParseSummary() throws Exception {
-		EventWebService service = new EventWebService(SERVICE_URL);
-		List<JsonEvent> events = service.parseJsonEventCollection(
-				new FileInputStream(new File("etc/geojson_testdata/summary.geojson")));
+	public void testParseJsonEventCollection() throws Exception {
+		// Summary branch
+		List<JsonEvent> events = comcat.parseJsonEventCollection(
+				new FileInputStream("etc/geojson_testdata/summary/query"));
 		Assert.assertEquals("11 events in summary feed", 11, events.size());
-	}
 
-	/**
-	 * Make a request for one event.
-	 *
-	 * @throws Exception
-	 */
-	@Test
-	public void testParseDetail() throws Exception {
-		EventWebService service = new EventWebService(SERVICE_URL);
-		List<JsonEvent> events = service.parseJsonEventCollection(
-				new FileInputStream(new File("etc/geojson_testdata/detail.geojson")));
+		// Detail branch
+		events = comcat.parseJsonEventCollection(
+				new FileInputStream("etc/geojson_testdata/detail/query"));
 		Assert.assertEquals("1 event in detail feed", 1, events.size());
 		Assert.assertEquals("event id is 'usb000hc6w'", "usb000hc6w",
 				events.get(0).getEventId().toString());
+	}
+
+	@Test(expected = Exception.class)
+	public void testNullFeed_parseJsonEventCollection () throws Exception {
+		List<JsonEvent> events = comcat.parseJsonEventCollection(
+				new ByteArrayInputStream((new String("[]"))
+						.getBytes()));
+	}
+
+	@Test(expected = Exception.class)
+	public void testNullType_parseJsonEventCollection () throws Exception {
+		List<JsonEvent> events = comcat.parseJsonEventCollection(
+				new ByteArrayInputStream((new String("{\"foo\": \"bar\"}"))
+						.getBytes()));
+	}
+
+	@Test
+	public void testUnknownType_parseJsonEventCollection () throws Exception {
+		List<JsonEvent> events = comcat.parseJsonEventCollection(
+				new ByteArrayInputStream((new String("{" +
+						"\"type\":\"SomethingElese\"" +
+					"}")).getBytes()));
+
+		Assert.assertEquals("No events parsed from unknown (but valid) format.",
+				0, events.size());
+	}
+
+	@Test(expected = Exception.class)
+	public void testNullFeatures_parseJsonEventCollection () throws Exception {
+		List<JsonEvent> events = comcat.parseJsonEventCollection(
+				new ByteArrayInputStream((new String("{" +
+					"\"type\": \"FeatureCollection\"" + // Note: no "features" key
+					"}")).getBytes()));
+	}
+
+	@Test(expected = Exception.class)
+	public void testNullFeature_parseJsonEventCollection () throws Exception {
+		List<JsonEvent> events = comcat.parseJsonEventCollection(
+				new ByteArrayInputStream((new String("{" +
+						"\"type\":\"FeatureCollection\"" +
+						"\"features\":[\"foo\", \"bar\"]" + // Array element not JSONObject
+					"}")).getBytes()));
+	}
+
+	@Test
+	public void testGetEvents () throws Exception {
+		List<JsonEvent> events = summary.getEvents(query);
+		Assert.assertNotNull("Successfully got events.", events);
+
+		// Note: Checking we got the _expected_ set of events is tested in the
+		//       parsing section of the unit tests.
+	}
+
+	@Test(expected = Exception.class)
+	public void testGetEvents_Null () throws Exception {
+		List<JsonEvent> events = (new ExceptionEventWebService(
+				new URL("http://localhost/"))).getEvents(new EventQuery());
 	}
 
 	/**
@@ -82,16 +149,13 @@ public class EventWebServiceTest {
 	 * @throws Exception
 	 */
 	public void testQuakeml() throws Exception {
-		EventWebService service = new EventWebService(SERVICE_URL);
-
-		EventQuery query = new EventQuery();
 		// past day
 		query.setStartTime(new Date(new Date().getTime() - 24 * 60 * 60 * 1000));
 		// M2.5+
 		query.setMinMagnitude(new BigDecimal("2.5"));
 		query.setFormat(Format.QUAKEML);
 
-		InputStream quakeml = UrlUtil.getInputStream(service.getUrl(query, null));
+		InputStream quakeml = UrlUtil.getInputStream(comcat.getUrl(query, null));
 		try {
 			int read = 0;
 			byte[] buf = new byte[1024];
@@ -107,4 +171,15 @@ public class EventWebServiceTest {
 		}
 	}
 
+
+	private class ExceptionEventWebService extends EventWebService {
+		public ExceptionEventWebService (final URL url) {
+			super(url);
+		}
+
+		public URL getUrl (EventQuery query, Format format)
+				throws MalformedURLException {
+			return null;
+		}
+	}
 }
