@@ -40,7 +40,7 @@ public class EventWebServiceTest {
 				service.getUrl(query, Format.GEOJSON),
 				new URL("http://comcat.cr.usgs.gov/fdsnws/event/1/query?"
 						+ "minmagnitude=2.5"
-						+ "&starttime=" + service.getIso8601Date(query.getStartTime())
+						+ "&starttime=" + EventWebService.getIso8601Date(query.getStartTime())
 						+ "&format=geojson"));
 	}
 
