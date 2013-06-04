@@ -9,9 +9,9 @@ import org.json.simple.JSONObject;
 /**
  * JSON Event class.
  */
-public class JsonEvent {
+public class JsonEvent extends JSONObject {
 
-	private JSONObject json;
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Construct a new JSONEvent from an existing json object.
@@ -19,15 +19,15 @@ public class JsonEvent {
 	 * @param json
 	 */
 	public JsonEvent(JSONObject json) {
-		this.json = new JSONObject(json);
+		super(json);
 	}
 
 	private JSONObject getProperties() {
-		return JsonUtil.getJsonObject(json.get("properties"));
+		return JsonUtil.getJsonObject(get("properties"));
 	}
 
 	private JSONArray getCoordinates() {
-		JSONObject geometry = JsonUtil.getJsonObject(json.get("geometry"));
+		JSONObject geometry = JsonUtil.getJsonObject(get("geometry"));
 		return JsonUtil.getJsonArray(geometry.get("coordinates"));
 	}
 
