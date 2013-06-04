@@ -22,7 +22,7 @@ import org.json.simple.parser.JSONParser;
 public class EventWebService {
 
 	/** ISO8601 date formatting object. */
-	public static SimpleDateFormat ISO8601_FORMAT = new SimpleDateFormat(
+	public static final SimpleDateFormat ISO8601_FORMAT = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 	static {
 		ISO8601_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
