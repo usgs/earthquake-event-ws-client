@@ -52,4 +52,29 @@ public class EventIdTest {
 		}
 	}
 
+	@Test
+	public void testEquals () {
+		String net = "foo";
+		String code = "bar";
+		EventId eventId1 = new EventId(net, code);
+		Object eventId1_1 = new EventId(net, code);
+		Object eventId2 = new EventId("something", "different");
+		Object eventId2_1 = new EventId(net, "different");
+		Object eventId2_2 = new EventId("something", code);
+
+		// Test non-equality
+		Assert.assertFalse("EventId not equal to regular Object.",
+				eventId1.equals(new Object()));
+		Assert.assertFalse("EventId not equal when network differs.",
+				eventId1.equals(eventId2_1));
+		Assert.assertFalse("EventId not equal when code differs.",
+				eventId1.equals(eventId2_2));
+		Assert.assertFalse("EventId not equal when net and code differs.",
+				eventId1.equals(eventId2));
+
+		// Test equality
+		Assert.assertTrue("EventId equal to itself.", eventId1.equals(eventId1));
+		Assert.assertTrue("EventId equal to simlar.", eventId1.equals(eventId1_1));
+	}
+
 }
