@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -21,8 +22,11 @@ import org.json.simple.parser.JSONParser;
 public class EventWebService {
 
 	/** ISO8601 date formatting object. */
-	SimpleDateFormat ISO8601_FORMAT = new SimpleDateFormat(
+	public static SimpleDateFormat ISO8601_FORMAT = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+	static {
+		ISO8601_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+	}
 
 	/** Base URL to the event web service. */
 	private final URL serviceURL;
@@ -183,7 +187,7 @@ public class EventWebService {
 	 *          date to encode.
 	 * @return iso8601 encoded date, or null if date is null.
 	 */
-	protected String getIso8601Date(final Date date) {
+	protected static String getIso8601Date(final Date date) {
 		if (date == null) {
 			return null;
 		}
