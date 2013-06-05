@@ -95,16 +95,14 @@ public class EventWebServiceTest {
 
 	@Test(expected = Exception.class)
 	public void testParseJsonEventCollection_nullFeed () throws Exception {
-		List<JsonEvent> events = comcat.parseJsonEventCollection(
-				new ByteArrayInputStream((new String("[]"))
-						.getBytes()));
+		comcat.parseJsonEventCollection(new ByteArrayInputStream(
+				(new String("[]")).getBytes()));
 	}
 
 	@Test(expected = Exception.class)
 	public void testParseJsonEventCollection_nullType () throws Exception {
-		List<JsonEvent> events = comcat.parseJsonEventCollection(
-				new ByteArrayInputStream((new String("{\"foo\": \"bar\"}"))
-						.getBytes()));
+		comcat.parseJsonEventCollection(new ByteArrayInputStream(
+				(new String("{\"foo\": \"bar\"}")).getBytes()));
 	}
 
 	@Test
@@ -120,19 +118,17 @@ public class EventWebServiceTest {
 
 	@Test(expected = Exception.class)
 	public void testParseJsonEventCollection_nullFeatures () throws Exception {
-		List<JsonEvent> events = comcat.parseJsonEventCollection(
-				new ByteArrayInputStream((new String("{" +
-					"\"type\": \"FeatureCollection\"" + // Note: no "features" key
-					"}")).getBytes()));
+		comcat.parseJsonEventCollection(new ByteArrayInputStream((new String("{" +
+				"\"type\": \"FeatureCollection\"" + // Note: no "features" key
+				"}")).getBytes()));
 	}
 
 	@Test(expected = Exception.class)
 	public void testParseJsonEventCollection_nullFeature () throws Exception {
-		List<JsonEvent> events = comcat.parseJsonEventCollection(
-				new ByteArrayInputStream((new String("{" +
-						"\"type\":\"FeatureCollection\"" +
-						"\"features\":[\"foo\", \"bar\"]" + // Array element not JSONObject
-					"}")).getBytes()));
+		comcat.parseJsonEventCollection(new ByteArrayInputStream((new String("{" +
+				"\"type\":\"FeatureCollection\"" +
+				"\"features\":[\"foo\", \"bar\"]" + // Array element not JSONObject
+				"}")).getBytes()));
 	}
 
 	@Test
@@ -161,7 +157,7 @@ public class EventWebServiceTest {
 
 	@Test(expected = Exception.class)
 	public void testGetEvents_Null () throws Exception {
-		List<JsonEvent> events = (new ExceptionEventWebService(
+		(new ExceptionEventWebService(
 				new URL("http://localhost/"))).getEvents(new EventQuery());
 	}
 
