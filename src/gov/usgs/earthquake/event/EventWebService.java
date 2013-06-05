@@ -1,6 +1,7 @@
 package gov.usgs.earthquake.event;
 
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -112,16 +113,19 @@ public class EventWebService {
 	 *           if any occur.
 	 */
 	public List<JsonEvent> getEvents(final EventQuery query) throws Exception {
-		InputStream result = UrlUtil.getInputStream(getUrl(query, Format.GEOJSON));
+		InputStream result = null;
+		List<JsonEvent> events = null;
+
 		try {
-			return parseJsonEventCollection(result);
+			result = UrlUtil.getInputStream(getUrl(query, Format.GEOJSON));
+			events = parseJsonEventCollection(result);
 		} finally {
-			try {
+			if (result != null) {
 				result.close();
-			} catch (Exception e) {
-				// ignore
 			}
 		}
+
+		return events;
 	}
 
 	/**

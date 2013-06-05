@@ -27,6 +27,8 @@ public class UrlUtil {
 		// request gzip
 		URLConnection conn = url.openConnection();
 		conn.addRequestProperty("Accept-encoding", GZIP_ENCODING);
+		conn.connect();
+
 		InputStream in = conn.getInputStream();
 
 		// ungzip response
