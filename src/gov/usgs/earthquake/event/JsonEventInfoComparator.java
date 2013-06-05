@@ -16,7 +16,7 @@ public class JsonEventInfoComparator implements Comparator<JsonEventInfo> {
 	 * 
 	 * @param sanityRules
 	 *            determines "euclidean" distance.
-	 * @param mainEvent
+	 * @param referenceEvent
 	 *            main event other events are compared agains.
 	 */
 	public JsonEventInfoComparator(EventSanityCheck sanityRules,
