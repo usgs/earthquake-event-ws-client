@@ -120,9 +120,7 @@ public class EventWebService {
 			result = UrlUtil.getInputStream(getUrl(query, Format.GEOJSON));
 			events = parseJsonEventCollection(result);
 		} finally {
-			if (result != null) {
-				result.close();
-			}
+			result.close();
 		}
 
 		return events;

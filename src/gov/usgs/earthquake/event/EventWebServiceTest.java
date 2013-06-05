@@ -1,37 +1,45 @@
 package gov.usgs.earthquake.event;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 import org.junit.Assert;
-import org.junit.Test;
 import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test methods for the EventWebService.
  */
 public class EventWebServiceTest {
 
+	private static final int LOCAL_PORT = 9999;
+	private static final String SUMMARY_FILE = "etc/testdata/summary.geojson";
+	private static final String DETAIL_FILE = "etc/testdata/detail.geojson";
+
 	private EventWebService comcat = null;
-	private EventWebService summary = null;
-	private EventWebService detail = null;
+	private EventWebService local = null;
 	private EventQuery query = null;
 
 	@Before
 	public void setup () throws Exception {
 		comcat = new EventWebService(
 				new URL("http://comcat.cr.usgs.gov/fdsnws/event/1/"));
-		summary = new EventWebService(
-				(new File("etc/geojson_testdata/summary/query")).toURI().toURL());
-		detail = new EventWebService(
-				(new File("etc/geojson_testdata/detail/query")).toURI().toURL());
+
+		local = new EventWebService(new URL("http://localhost:" +
+				String.valueOf(LOCAL_PORT) + "/fdsnws/event/1/"));
 
 		query = new EventQuery();
 	}
@@ -53,12 +61,12 @@ public class EventWebServiceTest {
 				"&format=geojson");
 
 		// Test with an explicit format
-		Assert.assertEquals("query url matches (explicit format).",
+		Assert.assertEquals("Query url matches (explicit format).",
 				expected, comcat.getUrl(query, Format.GEOJSON));
 
 		// Test with an implied format (from query)
 		query.setFormat(Format.GEOJSON);
-		Assert.assertEquals("query url matches (implied format).",
+		Assert.assertEquals("Query url matches (implied format).",
 				expected, comcat.getUrl(query, null));
 	}
 
@@ -68,36 +76,39 @@ public class EventWebServiceTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void testParseJsonEventCollection() throws Exception {
+	public void testParseJsonEventCollection_summary () throws Exception {
 		// Summary branch
 		List<JsonEvent> events = comcat.parseJsonEventCollection(
-				new FileInputStream("etc/geojson_testdata/summary/query"));
+				new FileInputStream(SUMMARY_FILE));
 		Assert.assertEquals("11 events in summary feed", 11, events.size());
+	}
 
+	@Test
+	public void testParseJsonEventCollection_detail () throws Exception {
 		// Detail branch
-		events = comcat.parseJsonEventCollection(
-				new FileInputStream("etc/geojson_testdata/detail/query"));
+		List<JsonEvent> events = comcat.parseJsonEventCollection(
+				new FileInputStream(DETAIL_FILE));
 		Assert.assertEquals("1 event in detail feed", 1, events.size());
 		Assert.assertEquals("event id is 'usb000hc6w'", "usb000hc6w",
 				events.get(0).getEventId().toString());
 	}
 
 	@Test(expected = Exception.class)
-	public void testNullFeed_parseJsonEventCollection () throws Exception {
+	public void testParseJsonEventCollection_nullFeed () throws Exception {
 		List<JsonEvent> events = comcat.parseJsonEventCollection(
 				new ByteArrayInputStream((new String("[]"))
 						.getBytes()));
 	}
 
 	@Test(expected = Exception.class)
-	public void testNullType_parseJsonEventCollection () throws Exception {
+	public void testParseJsonEventCollection_nullType () throws Exception {
 		List<JsonEvent> events = comcat.parseJsonEventCollection(
 				new ByteArrayInputStream((new String("{\"foo\": \"bar\"}"))
 						.getBytes()));
 	}
 
 	@Test
-	public void testUnknownType_parseJsonEventCollection () throws Exception {
+	public void testParseJsonEventCollection_unknownType () throws Exception {
 		List<JsonEvent> events = comcat.parseJsonEventCollection(
 				new ByteArrayInputStream((new String("{" +
 						"\"type\":\"SomethingElese\"" +
@@ -108,7 +119,7 @@ public class EventWebServiceTest {
 	}
 
 	@Test(expected = Exception.class)
-	public void testNullFeatures_parseJsonEventCollection () throws Exception {
+	public void testParseJsonEventCollection_nullFeatures () throws Exception {
 		List<JsonEvent> events = comcat.parseJsonEventCollection(
 				new ByteArrayInputStream((new String("{" +
 					"\"type\": \"FeatureCollection\"" + // Note: no "features" key
@@ -116,7 +127,7 @@ public class EventWebServiceTest {
 	}
 
 	@Test(expected = Exception.class)
-	public void testNullFeature_parseJsonEventCollection () throws Exception {
+	public void testParseJsonEventCollection_nullFeature () throws Exception {
 		List<JsonEvent> events = comcat.parseJsonEventCollection(
 				new ByteArrayInputStream((new String("{" +
 						"\"type\":\"FeatureCollection\"" +
@@ -126,8 +137,23 @@ public class EventWebServiceTest {
 
 	@Test
 	public void testGetEvents () throws Exception {
-		List<JsonEvent> events = summary.getEvents(query);
-		Assert.assertNotNull("Successfully got events.", events);
+		TestingWebServer server = null;
+		List<JsonEvent> events = null;
+
+		// No gzip
+		server = new TestingWebServer(LOCAL_PORT, SUMMARY_FILE);
+		server.start();
+		events = local.getEvents(query);
+		Assert.assertNotNull("Events fetched without compression.", events);
+		server.stop();
+
+		// With gzip
+		server = new TestingWebServer(LOCAL_PORT, SUMMARY_FILE, true);
+		server.start();
+		events = null;
+		events = local.getEvents(query);
+		Assert.assertNotNull("Events fetched with compression.", events);
+		server.stop();
 
 		// Note: Checking we got the _expected_ set of events is tested in the
 		//       parsing section of the unit tests.
@@ -181,5 +207,96 @@ public class EventWebServiceTest {
 				throws MalformedURLException {
 			return null;
 		}
+	}
+
+	private class TestingWebServer extends ServerSocket implements Runnable {
+		private byte [] response = null;
+		private boolean useGzip = false;
+		private boolean running = false;
+
+		public TestingWebServer (final int port, String responseFile)
+				throws Exception {
+			this(port, responseFile, false);
+		}
+
+		public TestingWebServer (final int port, final String responseFile,
+				boolean useGzip) throws Exception {
+			super(port);
+			this.response = getBytes(responseFile);
+			this.useGzip = useGzip;
+		}
+
+		public void run () {
+			while (stillRunning()) {
+				try {
+					Socket request = accept();
+					request.shutdownInput();
+
+					OutputStream out = request.getOutputStream();
+					sendResponse(out);
+
+					out.flush();
+					request.shutdownOutput();
+				} catch (SocketException sx) {
+					// Ignore
+				} catch (Exception ex) {
+					ex.printStackTrace(System.err);
+				}
+			}
+		}
+
+		public void start () throws Exception {
+			running = true;
+			(new Thread(this)).start();
+		}
+
+		public void stop () throws Exception {
+			running = false;
+			Thread.sleep(250); // Give server time to stop cleanly
+			close();
+		}
+
+		public boolean stillRunning () {
+			return running;
+		}
+
+		private void sendResponse (final OutputStream out) throws Exception {
+			OutputStream output = out;
+
+			output.write("HTTP/1.1 200 OK\r\n".getBytes());
+			output.write((new String("Content-Type: application/json\r\n")
+					.getBytes()));
+
+			if (useGzip) {
+				output.write((new String("Content-Encoding: gzip\r\n\r\n").getBytes()));
+				output.flush();
+
+				output = new GZIPOutputStream(out); // <-- will send gzip headers
+			} else {
+				output.write((new String("Content-Encoding: identity\n\n").getBytes()));
+				output.flush();
+			}
+
+			output.write(response);
+
+			if (useGzip) {
+				((GZIPOutputStream)output).finish();
+			}
+
+			output.flush();
+		}
+
+		private byte [] getBytes (final String fileName) throws Exception {
+			StringBuffer buf = new StringBuffer();
+			String line = null;
+			BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+			while ((line = reader.readLine()) != null) {
+				buf.append(line);
+			}
+
+			return buf.toString().getBytes();
+		}
+
 	}
 }
