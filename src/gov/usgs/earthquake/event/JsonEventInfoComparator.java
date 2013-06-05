@@ -42,10 +42,10 @@ public class JsonEventInfoComparator implements Comparator<JsonEventInfo> {
 
 		Double event1Distance = event1.getDistance();
 		Double event2Distance = event2.getDistance();
-		if (event1Distance > event2Distance) {
+		if (event1Distance < event2Distance) {
 			// event1 closer than event2
 			return -1;
-		} else if (event1Distance < event2Distance) {
+		} else if (event1Distance > event2Distance) {
 			// event2 closer than event1
 			return 1;
 		} else {
