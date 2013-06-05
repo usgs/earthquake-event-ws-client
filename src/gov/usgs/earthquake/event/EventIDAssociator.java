@@ -71,7 +71,6 @@ public class EventIDAssociator {
 	 *          the time.
 	 * @return a list of nearby events.
 	 * @throws Exception
-	 * @see gov.usgs.earthquake.indexer.DefaultAssociator
 	 */
 	public List<JsonEvent> getNearbyEvents(final BigDecimal latitude,
 			final BigDecimal longitude, final Date time, final String network)
