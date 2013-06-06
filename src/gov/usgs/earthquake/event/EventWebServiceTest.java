@@ -57,7 +57,7 @@ public class EventWebServiceTest {
 		expected = new URL(
 				"http://comcat.cr.usgs.gov/fdsnws/event/1/query?" +
 				"minmagnitude=2.5" +
-				"&starttime=" + EventWebService.getIso8601Date(query.getStartTime()) +
+				"&starttime=" + ISO8601.format(query.getStartTime()) +
 				"&format=geojson");
 
 		// Test with an explicit format

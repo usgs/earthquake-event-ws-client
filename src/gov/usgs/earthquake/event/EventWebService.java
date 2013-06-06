@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -50,7 +49,7 @@ public class EventWebService {
 		params.put("alertlevel", query.getAlertLevel());
 		params.put("catalog", query.getCatalog());
 		params.put("contributor", query.getContributor());
-		params.put("endtime", getIso8601Date(query.getEndTime()));
+		params.put("endtime", ISO8601.format(query.getEndTime()));
 		params.put("eventid", query.getEventId());
 		params.put("eventtype", query.getEventType());
 		params.put("format", format == null ? query.getFormat() : format);
@@ -86,8 +85,8 @@ public class EventWebService {
 		params.put("orderby", query.getOrderBy());
 		params.put("producttype", query.getProductType());
 		params.put("reviewstatus", query.getReviewStatus());
-		params.put("starttime", getIso8601Date(query.getStartTime()));
-		params.put("updatedafter", getIso8601Date(query.getUpdatedAfter()));
+		params.put("starttime", ISO8601.format(query.getStartTime()));
+		params.put("updatedafter", ISO8601.format(query.getUpdatedAfter()));
 
 		String queryString = UrlUtil.getQueryString(params);
 		return new URL(serviceURL, "query" + queryString);
@@ -169,20 +168,6 @@ public class EventWebService {
 		}
 
 		return events;
-	}
-
-	/**
-	 * Utility method to encode a Date using ISO8601, when not null.
-	 *
-	 * @param date
-	 *          date to encode.
-	 * @return iso8601 encoded date, or null if date is null.
-	 */
-	protected static String getIso8601Date(final Date date) {
-		if (date == null) {
-			return null;
-		}
-		return ISO8601.format(date);
 	}
 
 }
