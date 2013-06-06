@@ -8,9 +8,13 @@ import java.math.MathContext;
  */
 public class EventComparison {
 
+	/** location difference in kilometers. */
 	private final BigDecimal locationDifference;
+	/** magnitude difference. */
 	private final BigDecimal magnitudeDifference;
+	/** depth difference in kilometers. */
 	private final BigDecimal depthDifference;
+	/** time difference in seconds. */
 	private final BigDecimal timeDifference;
 
 	public EventComparison(EventInfo a, EventInfo b) {
@@ -41,6 +45,16 @@ public class EventComparison {
 					- b.getTime().getTime()).abs().divide(new BigDecimal("1000"))
 					.round(roundContext);
 		}
+	}
+
+	public EventComparison(final BigDecimal timeDifference,
+			final BigDecimal locationDifference,
+			final BigDecimal depthDifference,
+			final BigDecimal magnitudeDifference) {
+		this.timeDifference = timeDifference;
+		this.locationDifference = locationDifference;
+		this.depthDifference = depthDifference;
+		this.magnitudeDifference = magnitudeDifference;
 	}
 
 	public BigDecimal getLocationDifference() {
