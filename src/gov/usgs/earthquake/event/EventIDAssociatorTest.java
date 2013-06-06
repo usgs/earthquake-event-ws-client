@@ -2,6 +2,7 @@ package gov.usgs.earthquake.event;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +30,39 @@ public class EventIDAssociatorTest {
 				EventIDAssociator.DEFAULT_TIME_DIFFERENCE,
 				EventIDAssociator.DEFAULT_LOCATION_DIFFERENCE, MAGNITUDE_DIFFERENCE,
 				DEPTH_DIFFERENCE), new EventSanityCheck());
+	}
+
+	/**
+	 * Make sure default constructor can be used without exceptions being thrown.
+	 */
+	@Test
+	public void defaultContructorWorks() {
+		try {
+			new EventIDAssociator();
+		} catch (MalformedURLException mue) {
+			Assert.fail("default contructor threw exception");
+		}
+	}
+
+	/**
+	 * Test getter/setters.
+	 */
+	@Test
+	public void testGetterSetters() {
+		EventWebService service = new EventWebService(null);
+		testAssociator.setEventWebService(service);
+		Assert.assertSame("service getter/setter",
+				service, testAssociator.getEventWebService());
+
+		EventSanityCheck testCheck = new EventSanityCheck();
+		testAssociator.setEventSanityCheck(testCheck);
+		Assert.assertSame("sanity check getter/setter",
+				testCheck, testAssociator.getEventSanityCheck());
+
+		EventComparison testCriteria = new EventComparison(null, null, null, null);
+		testAssociator.setNearbyCriteria(testCriteria);
+		Assert.assertSame("criteria getter/setter",
+				testCriteria, testAssociator.getNearbyCriteria());
 	}
 
 	/**
@@ -94,6 +128,90 @@ public class EventIDAssociatorTest {
 	}
 
 	/**
+	 * When a criteria is null, it should not be used in a query.
+	 */
+	@Test
+	public void testNullCriteria() throws Exception {
+		EventQuery query = null;
+		Date time = new Date();
+		BigDecimal latitude = new BigDecimal("34");
+		BigDecimal longitude = new BigDecimal("-118");
+		BigDecimal depth = new BigDecimal("1.32");
+		BigDecimal magnitude = new BigDecimal("4.5");
+		String network = "net";
+
+		// null location criteria
+		testAssociator.setNearbyCriteria(new EventComparison(
+				BigDecimal.ONE, null, BigDecimal.ONE, BigDecimal.ONE));
+		testAssociator.getNearbyEvents(time, latitude, longitude, depth, magnitude, null);
+		query = testService.lastQuery;
+		Assert.assertNotNull("starttime", query.getStartTime());
+		Assert.assertNotNull("endtime", query.getEndTime());
+		Assert.assertNull("no longitude", query.getLongitude());
+		Assert.assertNull("no latitude", query.getLatitude());
+		Assert.assertNull("no maxradius", query.getMaxRadius());
+		Assert.assertNotNull("mindepth", query.getMinDepth());
+		Assert.assertNotNull("maxdepth", query.getMaxDepth());
+		Assert.assertNotNull("minmagnitude", query.getMinMagnitude());
+		Assert.assertNotNull("maxmagnitude", query.getMaxMagnitude());
+		Assert.assertNull("catalog", query.getCatalog());
+
+		// do opposite
+		testAssociator.setNearbyCriteria(new EventComparison(
+				null, BigDecimal.ONE, null, null));
+		testAssociator.getNearbyEvents(time, latitude, longitude, depth, magnitude, network);
+		query = testService.lastQuery;
+		Assert.assertNull("no starttime", query.getStartTime());
+		Assert.assertNull("no endtime", query.getEndTime());
+		Assert.assertNotNull("longitude", query.getLongitude());
+		Assert.assertNotNull("latitude", query.getLatitude());
+		Assert.assertNotNull("maxradius", query.getMaxRadius());
+		Assert.assertNull("no mindepth", query.getMinDepth());
+		Assert.assertNull("no maxdepth", query.getMaxDepth());
+		Assert.assertNull("no minmagnitude", query.getMinMagnitude());
+		Assert.assertNull("no maxmagnitude", query.getMaxMagnitude());
+		Assert.assertNotNull("catalog", query.getCatalog());
+
+		// with location criteria and partial location
+		testAssociator.setNearbyCriteria(new EventComparison(
+				BigDecimal.ONE, BigDecimal.ONE, null, null));
+		testAssociator.getNearbyEvents(time, null, longitude, depth, magnitude, null);
+		query = testService.lastQuery;
+		Assert.assertNull("no longitude", query.getLongitude());
+		Assert.assertNull("no latitude", query.getLatitude());
+		Assert.assertNull("no maxradius", query.getMaxRadius());
+		testAssociator.getNearbyEvents(time, latitude, null, depth, magnitude, null);
+		query = testService.lastQuery;
+		Assert.assertNull("no longitude", query.getLongitude());
+		Assert.assertNull("no latitude", query.getLatitude());
+		Assert.assertNull("no maxradius", query.getMaxRadius());
+	}
+
+	/**
+	 * Test sort order via getSortedNearbyEvents.
+	 */
+	@Test
+	public void testAssociatorSort() throws Exception {
+		// add out of order to events list
+		JsonEventInfoComparatorTest comparatorTest = new JsonEventInfoComparatorTest();
+		comparatorTest.setup();
+		testService.events.add(comparatorTest.farEvent);
+		testService.events.add(comparatorTest.fartherEvent);
+		testService.events.add(comparatorTest.closeEvent);
+
+		JsonEventInfo reference = new JsonEventInfo(comparatorTest.referenceEvent);
+		List<JsonEventInfo> sorted = testAssociator.getSortedNearbyEvents(
+				reference, null);
+		Assert.assertEquals("closest event first",
+				comparatorTest.closeEvent, sorted.get(0).getEvent());
+		Assert.assertEquals("farther event last",
+				comparatorTest.fartherEvent,
+				sorted.get(testService.events.size() - 1).getEvent());
+
+		System.err.println(testAssociator.formatOutput(reference, null, sorted));
+	}
+
+	/**
 	 * Test event web service that returns empty list of events, and captures
 	 * queries for inspection.
 	 */
@@ -104,11 +222,12 @@ public class EventIDAssociatorTest {
 		}
 
 		public EventQuery lastQuery = null;
+		public List<JsonEvent> events = new ArrayList<JsonEvent>();
 
 		@Override
 		public List<JsonEvent> getEvents(final EventQuery query) {
 			this.lastQuery = query;
-			return new ArrayList<JsonEvent>();
+			return events;
 		}
 
 	}
