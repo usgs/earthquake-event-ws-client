@@ -190,6 +190,7 @@ public class EventIDAssociator {
 		return sortEvents(getNearbyEvents(info, network), info);
 	}
 
+	public static final int EXIT_SUCCESS = 0;
 	public static final int EXIT_EVENT_NOT_FOUND = 1;
 	public static final int EXIT_EVENT_NOT_SANE = 2;
 	public static final int EXIT_MULTIPLE_EVENTS_FOUND = 4;
@@ -239,13 +240,15 @@ public class EventIDAssociator {
 		}
 
 		// display usage
-		if (time == null || latitude == null || longitude == null) {
+		if (time == null && (latitude == null || longitude == null)) {
 			System.err.println("Usage: java EventIDAssociator"
-					+ " --time=ISO8601 --latitude=LAT --longitude=LON"
+					+ " [--time=ISO8601] [--latitude=LAT --longitude=LON]"
 					+ " [--depth=DEPTH] [--magnitude=MAG] [--network=NET]"
 					+ " [--url=SERVICE_URL]");
+			System.err.println();
+			System.err.println("Time, or latitude and longitude, are required");
 			System.err.println("Exit values:");
-			System.err.println("\t" + 0 + " - one event found");
+			System.err.println("\t" + EXIT_SUCCESS + " - one event found");
 			System.err.println("\t" + EXIT_EVENT_NOT_FOUND + " - no events found");
 			System.err.println("\t" + EXIT_EVENT_NOT_SANE
 					+ " - event significantly different");
@@ -270,19 +273,40 @@ public class EventIDAssociator {
 				.println(associator.formatOutput(referenceEvent, network, events));
 
 		// output exit code
-		if (events.size() == 0) {
-			System.exit(EXIT_EVENT_NOT_FOUND);
-		} else if (events.size() > 1) {
-			System.exit(EXIT_MULTIPLE_EVENTS_FOUND);
-		} else {
-			// one event, check if sane
-			if (associator.getEventSanityCheck().isMatch(
-					events.get(0).getEventComparison()) != null) {
-				System.exit(EXIT_EVENT_NOT_SANE);
-			}
-		}
+		System.exit(associator.getExitCode(events));
 	}
 
+	/**
+	 * Determine main method exit code based on list of events.
+	 *
+	 * @param events list of events
+	 * @return exit code.
+	 */
+	public int getExitCode(final List<JsonEventInfo> events) {
+		// output exit code
+		if (events.size() == 0) {
+			return EXIT_EVENT_NOT_FOUND;
+		} else if (events.size() > 1) {
+			return EXIT_MULTIPLE_EVENTS_FOUND;
+		} else {
+			// one event, check if sane
+			if (getEventSanityCheck().isMatch(
+					events.get(0).getEventComparison()) != null) {
+				return EXIT_EVENT_NOT_SANE;
+			}
+		}
+		return EXIT_SUCCESS;
+	}
+
+	/**
+	 * Format main method output based on referenceEvent, search network,
+	 * and list of found events.
+	 *
+	 * @param  referenceEvent the reference event information (search).
+	 * @param  network        network that was searched
+	 * @param  events         found events
+	 * @return                geojson formatted output.
+	 */
 	@SuppressWarnings("unchecked")
 	public String formatOutput(final EventInfo referenceEvent,
 			final String network, final List<JsonEventInfo> events) {
