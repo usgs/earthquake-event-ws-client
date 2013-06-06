@@ -83,19 +83,13 @@ public class EventComparison {
 	 * @return distance in kilometers, or null if one event doesn't have location.
 	 */
 	public static BigDecimal getDistance(final EventInfo a, final EventInfo b) {
-
-		if ((a.getLongitude() == null) || (a.getLatitude() == null)
-				|| (b.getLongitude() == null) || (b.getLatitude() == null)) {
+		try {
+			return new BigDecimal(getDistance(
+					a.getLongitude().doubleValue(), b.getLongitude().doubleValue(),
+					a.getLatitude().doubleValue(), b.getLatitude().doubleValue()));
+		} catch (NullPointerException npe) {
 			return null;
 		}
-
-		// latitude and longitude of each event in radians
-		double lona = a.getLongitude().doubleValue() * Math.PI / 180;
-		double lonb = b.getLongitude().doubleValue() * Math.PI / 180;
-		double lata = a.getLatitude().doubleValue() * Math.PI / 180;
-		double latb = b.getLatitude().doubleValue() * Math.PI / 180;
-
-		return new BigDecimal(getDistance(lona, lonb, lata, latb));
 	}
 
 	/**
