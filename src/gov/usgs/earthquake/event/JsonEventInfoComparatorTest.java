@@ -12,10 +12,10 @@ import org.junit.Test;
 
 public class JsonEventInfoComparatorTest {
 
-	private JsonEvent referenceEvent;
-	private JsonEvent closeEvent;
-	private JsonEvent farEvent;
-	private JsonEvent fartherEvent;
+	public JsonEvent referenceEvent;
+	public JsonEvent closeEvent;
+	public JsonEvent farEvent;
+	public JsonEvent fartherEvent;
 
 	@Before
 	public void setup() {
