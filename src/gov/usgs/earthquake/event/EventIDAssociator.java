@@ -216,68 +216,15 @@ public class EventIDAssociator {
 	public static final String MAGNITUDE_CHECK_ARGUMENT = "--magnitudeCheck=";
 
 	public static void main(final String[] args) throws Exception {
-		// parse search arguments
-		Date time = null;
-		BigDecimal latitude = null;
-		BigDecimal longitude = null;
-		BigDecimal depth = null;
-		BigDecimal magnitude = null;
-		String network = null;
-		URL serviceUrl = new URL(DEFAULT_SERVICE_URL);
+		// parse arguments
+		EventInfo referenceEvent = parseReferenceEvent(args);
+		String network = parseNetwork(args);
+		EventIDAssociator associator = parseEventIDAssociator(args);
 
-		BigDecimal timeDifference = DEFAULT_TIME_DIFFERENCE;
-		BigDecimal locationDifference = DEFAULT_LOCATION_DIFFERENCE;
-		BigDecimal depthDifference = DEFAULT_DEPTH_DIFFERENCE;
-		BigDecimal magnitudeDifference = DEFAULT_MAGNITUDE_DIFFERENCE;
-		BigDecimal timeCheck = EventSanityCheck.TIME_THRESHOLD;
-		BigDecimal locationCheck = EventSanityCheck.DISTANCE_THRESHOLD;
-		BigDecimal depthCheck = EventSanityCheck.DEPTH_THRESHOLD;
-		BigDecimal magnitudeCheck = EventSanityCheck.MAGNITUDE_THRESHOLD;
-
-		for (String arg : args) {
-			if (arg.startsWith(TIME_ARGUMENT)) {
-				time = ISO8601.parse(arg.replace(TIME_ARGUMENT, ""));
-			} else if (arg.startsWith(LATITUDE_ARGUMENT)) {
-				latitude = new BigDecimal(arg.replace(LATITUDE_ARGUMENT, ""));
-			} else if (arg.startsWith(LONGITUDE_ARGUMENT)) {
-				longitude = new BigDecimal(arg.replace(LONGITUDE_ARGUMENT, ""));
-			} else if (arg.startsWith(DEPTH_ARGUMENT)) {
-				depth = new BigDecimal(arg.replace(DEPTH_ARGUMENT, ""));
-			} else if (arg.startsWith(MAGNITUDE_ARGUMENT)) {
-				magnitude = new BigDecimal(arg.replace(MAGNITUDE_ARGUMENT, ""));
-			} else if (arg.startsWith(NETWORK_ARGUMENT)) {
-				network = arg.replace(NETWORK_ARGUMENT, "");
-			} else if (arg.startsWith(SERVICE_URL_ARGUMENT)) {
-				serviceUrl = new URL(arg.replace(SERVICE_URL_ARGUMENT, ""));
-			} else if (arg.startsWith(TIME_DIFFERENCE_ARGUMENT)) {
-				timeDifference = new BigDecimal(
-						arg.replace(TIME_DIFFERENCE_ARGUMENT, ""));
-			} else if (arg.startsWith(LOCATION_DIFFERENCE_ARGUMENT)) {
-				locationDifference = new BigDecimal(
-						arg.replace(LOCATION_DIFFERENCE_ARGUMENT, ""));
-			} else if (arg.startsWith(DEPTH_DIFFERENCE_ARGUMENT)) {
-				depthDifference = new BigDecimal(
-						arg.replace(DEPTH_DIFFERENCE_ARGUMENT, ""));
-			} else if (arg.startsWith(MAGNITUDE_DIFFERENCE_ARGUMENT)) {
-				magnitudeDifference = new BigDecimal(
-						arg.replace(MAGNITUDE_DIFFERENCE_ARGUMENT, ""));
-			} else if (arg.startsWith(TIME_CHECK_ARGUMENT)) {
-				timeCheck = new BigDecimal(
-						arg.replace(TIME_CHECK_ARGUMENT, ""));
-			} else if (arg.startsWith(LOCATION_CHECK_ARGUMENT)) {
-				locationCheck = new BigDecimal(
-						arg.replace(LOCATION_CHECK_ARGUMENT, ""));
-			} else if (arg.startsWith(DEPTH_CHECK_ARGUMENT)) {
-				depthCheck = new BigDecimal(
-						arg.replace(DEPTH_CHECK_ARGUMENT, ""));
-			} else if (arg.startsWith(MAGNITUDE_CHECK_ARGUMENT)) {
-				magnitudeCheck = new BigDecimal(
-						arg.replace(MAGNITUDE_CHECK_ARGUMENT, ""));
-			}
-		}
-
-		// display usage
-		if (time == null && (latitude == null || longitude == null)) {
+		// check usage
+		if (referenceEvent.getTime() == null
+				&& (referenceEvent.getLatitude() == null
+						|| referenceEvent.getLongitude() == null)) {
 			System.err.println("Usage: java EventIDAssociator"
 					+ " [--time=ISO8601] [--latitude=LAT --longitude=LON]"
 					+ " [--depth=DEPTH] [--magnitude=MAG] [--network=NET]"
@@ -311,16 +258,7 @@ public class EventIDAssociator {
 			System.exit(EXIT_USAGE);
 		}
 
-		EventIDAssociator associator = new EventIDAssociator(
-				new EventWebService(serviceUrl),
-				new EventComparison(timeDifference, locationDifference, depthDifference,
-						magnitudeDifference),
-				new EventSanityCheck(timeCheck, locationCheck, depthCheck,
-						magnitudeCheck));
-
 		// search for nearby events
-		EventInfo referenceEvent = new DefaultEventInfo(null, time, latitude,
-				longitude, depth, magnitude);
 		List<JsonEventInfo> events = associator.getSortedNearbyEvents(
 				referenceEvent, network);
 
@@ -329,7 +267,94 @@ public class EventIDAssociator {
 				associator.formatOutput(referenceEvent, network, events));
 
 		// output exit code
-		System.exit(associator.getExitCode(events));
+		int exitCode = associator.getExitCode(events);
+		if (exitCode != 0) {
+			System.exit(exitCode);
+		}
+	}
+
+
+	protected static EventInfo parseReferenceEvent(final String[] args) {
+		Date time = null;
+		BigDecimal latitude = null;
+		BigDecimal longitude = null;
+		BigDecimal depth = null;
+		BigDecimal magnitude = null;
+		for (String arg : args) {
+			if (arg.startsWith(TIME_ARGUMENT)) {
+				time = ISO8601.parse(arg.replace(TIME_ARGUMENT, ""));
+			} else if (arg.startsWith(LATITUDE_ARGUMENT)) {
+				latitude = new BigDecimal(arg.replace(LATITUDE_ARGUMENT, ""));
+			} else if (arg.startsWith(LONGITUDE_ARGUMENT)) {
+				longitude = new BigDecimal(arg.replace(LONGITUDE_ARGUMENT, ""));
+			} else if (arg.startsWith(DEPTH_ARGUMENT)) {
+				depth = new BigDecimal(arg.replace(DEPTH_ARGUMENT, ""));
+			} else if (arg.startsWith(MAGNITUDE_ARGUMENT)) {
+				magnitude = new BigDecimal(arg.replace(MAGNITUDE_ARGUMENT, ""));
+			}
+		}
+		return new DefaultEventInfo(
+				null, time, latitude, longitude, depth, magnitude);
+	}
+
+	protected static String parseNetwork(final String[] args) {
+		String network = null;
+		for (String arg : args) {
+			if (arg.startsWith(NETWORK_ARGUMENT)) {
+				network = arg.replace(NETWORK_ARGUMENT, "");
+			}
+		}
+		return network;
+	}
+
+	protected static EventIDAssociator parseEventIDAssociator(final String[] args)
+			throws MalformedURLException {
+		URL serviceUrl = new URL(DEFAULT_SERVICE_URL);
+		BigDecimal timeDifference = DEFAULT_TIME_DIFFERENCE;
+		BigDecimal locationDifference = DEFAULT_LOCATION_DIFFERENCE;
+		BigDecimal depthDifference = DEFAULT_DEPTH_DIFFERENCE;
+		BigDecimal magnitudeDifference = DEFAULT_MAGNITUDE_DIFFERENCE;
+		BigDecimal timeCheck = EventSanityCheck.TIME_THRESHOLD;
+		BigDecimal locationCheck = EventSanityCheck.DISTANCE_THRESHOLD;
+		BigDecimal depthCheck = EventSanityCheck.DEPTH_THRESHOLD;
+		BigDecimal magnitudeCheck = EventSanityCheck.MAGNITUDE_THRESHOLD;
+
+		for (String arg : args) {
+			if (arg.startsWith(SERVICE_URL_ARGUMENT)) {
+				serviceUrl = new URL(arg.replace(SERVICE_URL_ARGUMENT, ""));
+			} else if (arg.startsWith(TIME_DIFFERENCE_ARGUMENT)) {
+				timeDifference = new BigDecimal(
+						arg.replace(TIME_DIFFERENCE_ARGUMENT, ""));
+			} else if (arg.startsWith(LOCATION_DIFFERENCE_ARGUMENT)) {
+				locationDifference = new BigDecimal(
+						arg.replace(LOCATION_DIFFERENCE_ARGUMENT, ""));
+			} else if (arg.startsWith(DEPTH_DIFFERENCE_ARGUMENT)) {
+				depthDifference = new BigDecimal(
+						arg.replace(DEPTH_DIFFERENCE_ARGUMENT, ""));
+			} else if (arg.startsWith(MAGNITUDE_DIFFERENCE_ARGUMENT)) {
+				magnitudeDifference = new BigDecimal(
+						arg.replace(MAGNITUDE_DIFFERENCE_ARGUMENT, ""));
+			} else if (arg.startsWith(TIME_CHECK_ARGUMENT)) {
+				timeCheck = new BigDecimal(
+						arg.replace(TIME_CHECK_ARGUMENT, ""));
+			} else if (arg.startsWith(LOCATION_CHECK_ARGUMENT)) {
+				locationCheck = new BigDecimal(
+						arg.replace(LOCATION_CHECK_ARGUMENT, ""));
+			} else if (arg.startsWith(DEPTH_CHECK_ARGUMENT)) {
+				depthCheck = new BigDecimal(
+						arg.replace(DEPTH_CHECK_ARGUMENT, ""));
+			} else if (arg.startsWith(MAGNITUDE_CHECK_ARGUMENT)) {
+				magnitudeCheck = new BigDecimal(
+						arg.replace(MAGNITUDE_CHECK_ARGUMENT, ""));
+			}
+		}
+
+		return new EventIDAssociator(
+				new EventWebService(serviceUrl),
+				new EventComparison(timeDifference, locationDifference, depthDifference,
+						magnitudeDifference),
+				new EventSanityCheck(timeCheck, locationCheck, depthCheck,
+						magnitudeCheck));
 	}
 
 	/**
@@ -338,7 +363,7 @@ public class EventIDAssociator {
 	 * @param events list of events
 	 * @return exit code.
 	 */
-	public int getExitCode(final List<JsonEventInfo> events) {
+	protected int getExitCode(final List<JsonEventInfo> events) {
 		// output exit code
 		if (events.size() == 0) {
 			return EXIT_EVENT_NOT_FOUND;
@@ -364,7 +389,7 @@ public class EventIDAssociator {
 	 * @return                geojson formatted output.
 	 */
 	@SuppressWarnings("unchecked")
-	public String formatOutput(final EventInfo referenceEvent,
+	protected String formatOutput(final EventInfo referenceEvent,
 			final String network, final List<JsonEventInfo> events) {
 		// build json output
 		JSONObject jsonMetadata = new JSONObject();
