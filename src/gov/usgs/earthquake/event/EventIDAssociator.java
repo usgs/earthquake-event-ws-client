@@ -327,13 +327,22 @@ public class EventIDAssociator {
 	public EventWebService getEventWebService() {
 		return service;
 	}
+	public void setEventWebService(final EventWebService service) {
+		this.service = service;
+	}
 
 	public EventComparison getNearbyCriteria() {
 		return nearbyCriteria;
 	}
+	public void setNearbyCriteria(final EventComparison nearbyCriteria) {
+		this.nearbyCriteria = nearbyCriteria;
+	}
 
 	public EventSanityCheck getEventSanityCheck() {
 		return sanityCheck;
+	}
+	public void setEventSanityCheck(final EventSanityCheck sanityCheck) {
+		this.sanityCheck = sanityCheck;
 	}
 
 }
