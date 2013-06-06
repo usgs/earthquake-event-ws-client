@@ -206,6 +206,15 @@ public class EventIDAssociator {
 	public static final String MAGNITUDE_ARGUMENT = "--magnitude=";
 	public static final String NETWORK_ARGUMENT = "--network=";
 
+	public static final String TIME_DIFFERENCE_ARGUMENT = "--timeSearch";
+	public static final String LOCATION_DIFFERENCE_ARGUMENT = "--locationSearch=";
+	public static final String DEPTH_DIFFERENCE_ARGUMENT = "--depthSearch=";
+	public static final String MAGNITUDE_DIFFERENCE_ARGUMENT = "--magnitudeSearch=";
+	public static final String TIME_CHECK_ARGUMENT = "--timeCheck";
+	public static final String LOCATION_CHECK_ARGUMENT = "--locationCheck=";
+	public static final String DEPTH_CHECK_ARGUMENT = "--depthCheck=";
+	public static final String MAGNITUDE_CHECK_ARGUMENT = "--magnitudeCheck=";
+
 	public static void main(final String[] args) throws Exception {
 		// parse search arguments
 		Date time = null;
@@ -220,6 +229,10 @@ public class EventIDAssociator {
 		BigDecimal locationDifference = DEFAULT_LOCATION_DIFFERENCE;
 		BigDecimal depthDifference = DEFAULT_DEPTH_DIFFERENCE;
 		BigDecimal magnitudeDifference = DEFAULT_MAGNITUDE_DIFFERENCE;
+		BigDecimal timeCheck = EventSanityCheck.TIME_THRESHOLD;
+		BigDecimal locationCheck = EventSanityCheck.DISTANCE_THRESHOLD;
+		BigDecimal depthCheck = EventSanityCheck.DEPTH_THRESHOLD;
+		BigDecimal magnitudeCheck = EventSanityCheck.MAGNITUDE_THRESHOLD;
 
 		for (String arg : args) {
 			if (arg.startsWith(TIME_ARGUMENT)) {
@@ -236,6 +249,30 @@ public class EventIDAssociator {
 				network = arg.replace(NETWORK_ARGUMENT, "");
 			} else if (arg.startsWith(SERVICE_URL_ARGUMENT)) {
 				serviceUrl = new URL(arg.replace(SERVICE_URL_ARGUMENT, ""));
+			} else if (arg.startsWith(TIME_DIFFERENCE_ARGUMENT)) {
+				timeDifference = new BigDecimal(
+						arg.replace(TIME_DIFFERENCE_ARGUMENT, ""));
+			} else if (arg.startsWith(LOCATION_DIFFERENCE_ARGUMENT)) {
+				locationDifference = new BigDecimal(
+						arg.replace(LOCATION_DIFFERENCE_ARGUMENT, ""));
+			} else if (arg.startsWith(DEPTH_DIFFERENCE_ARGUMENT)) {
+				depthDifference = new BigDecimal(
+						arg.replace(DEPTH_DIFFERENCE_ARGUMENT, ""));
+			} else if (arg.startsWith(MAGNITUDE_DIFFERENCE_ARGUMENT)) {
+				magnitudeDifference = new BigDecimal(
+						arg.replace(MAGNITUDE_DIFFERENCE_ARGUMENT, ""));
+			} else if (arg.startsWith(TIME_CHECK_ARGUMENT)) {
+				timeCheck = new BigDecimal(
+						arg.replace(TIME_CHECK_ARGUMENT, ""));
+			} else if (arg.startsWith(LOCATION_CHECK_ARGUMENT)) {
+				locationCheck = new BigDecimal(
+						arg.replace(LOCATION_CHECK_ARGUMENT, ""));
+			} else if (arg.startsWith(DEPTH_CHECK_ARGUMENT)) {
+				depthCheck = new BigDecimal(
+						arg.replace(DEPTH_CHECK_ARGUMENT, ""));
+			} else if (arg.startsWith(MAGNITUDE_CHECK_ARGUMENT)) {
+				magnitudeCheck = new BigDecimal(
+						arg.replace(MAGNITUDE_CHECK_ARGUMENT, ""));
 			}
 		}
 
@@ -244,7 +281,23 @@ public class EventIDAssociator {
 			System.err.println("Usage: java EventIDAssociator"
 					+ " [--time=ISO8601] [--latitude=LAT --longitude=LON]"
 					+ " [--depth=DEPTH] [--magnitude=MAG] [--network=NET]"
-					+ " [--url=SERVICE_URL]");
+					+ " [--url=SERVICE_URL]"
+					+ " [" + TIME_DIFFERENCE_ARGUMENT
+							+ DEFAULT_TIME_DIFFERENCE + "]"
+					+ " [" + LOCATION_DIFFERENCE_ARGUMENT
+							+ DEFAULT_LOCATION_DIFFERENCE + "]"
+					+ " [" + DEPTH_DIFFERENCE_ARGUMENT
+							+ DEFAULT_DEPTH_DIFFERENCE + "]"
+					+ " [" + MAGNITUDE_DIFFERENCE_ARGUMENT
+							+ DEFAULT_MAGNITUDE_DIFFERENCE + "]"
+					+ " [ " + TIME_CHECK_ARGUMENT
+							+ EventSanityCheck.TIME_THRESHOLD + "]"
+					+ " [ " + LOCATION_CHECK_ARGUMENT
+							+ EventSanityCheck.DISTANCE_THRESHOLD + "]"
+					+ " [ " + DEPTH_CHECK_ARGUMENT
+							+ EventSanityCheck.DEPTH_THRESHOLD + "]"
+					+ " [ " + MAGNITUDE_CHECK_ARGUMENT
+							+ EventSanityCheck.MAGNITUDE_THRESHOLD + "]");
 			System.err.println();
 			System.err.println("Time, or latitude and longitude, are required");
 			System.err.println("Exit values:");
@@ -258,9 +311,12 @@ public class EventIDAssociator {
 			System.exit(EXIT_USAGE);
 		}
 
-		EventIDAssociator associator = new EventIDAssociator(new EventWebService(
-				serviceUrl), new EventComparison(timeDifference, locationDifference,
-				depthDifference, magnitudeDifference), new EventSanityCheck());
+		EventIDAssociator associator = new EventIDAssociator(
+				new EventWebService(serviceUrl),
+				new EventComparison(timeDifference, locationDifference, depthDifference,
+						magnitudeDifference),
+				new EventSanityCheck(timeCheck, locationCheck, depthCheck,
+						magnitudeCheck));
 
 		// search for nearby events
 		EventInfo referenceEvent = new DefaultEventInfo(null, time, latitude,
@@ -269,8 +325,8 @@ public class EventIDAssociator {
 				referenceEvent, network);
 
 		// output results
-		System.out
-				.println(associator.formatOutput(referenceEvent, network, events));
+		System.out.println(
+				associator.formatOutput(referenceEvent, network, events));
 
 		// output exit code
 		System.exit(associator.getExitCode(events));
