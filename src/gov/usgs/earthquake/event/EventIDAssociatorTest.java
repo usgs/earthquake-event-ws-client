@@ -3,6 +3,7 @@ package gov.usgs.earthquake.event;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -235,7 +236,7 @@ public class EventIDAssociatorTest {
 				EventIDAssociator.EXIT_EVENT_NOT_FOUND,
 				testAssociator.getExitCode(new ArrayList<JsonEventInfo>()));
 		// multiple events
-		Assert.assertEquals("multiple events", 
+		Assert.assertEquals("multiple events",
 				EventIDAssociator.EXIT_MULTIPLE_EVENTS_FOUND,
 				testAssociator.getExitCode(sorted));
 		// one good event
@@ -253,9 +254,158 @@ public class EventIDAssociatorTest {
 	}
 
 	@Test
-	public void testUsage() throws Exception {
+	public void testUsageNoArgs() throws Exception {
 		exit.expectSystemExitWithStatus(EventIDAssociator.EXIT_USAGE);
-		EventIDAssociator.main(new String[] { "--help" });
+		// no time, latitude, or longitude
+		EventIDAssociator.main(new String[] {});
+	}
+
+	@Test
+	public void testUsageLatOnly() throws Exception {
+		exit.expectSystemExitWithStatus(EventIDAssociator.EXIT_USAGE);
+		// no time, or longitude
+		EventIDAssociator.main(new String[] {
+				EventIDAssociator.LATITUDE_ARGUMENT + "35"});
+	}
+
+	@Test
+	public void testTimeOnly() throws Exception {
+		exit.expectSystemExitWithStatus(EventIDAssociator.EXIT_MULTIPLE_EVENTS_FOUND);
+		// serve a custom feed with multiple events
+		EventWebServiceTest.TestingWebServer server =
+				new EventWebServiceTest.TestingWebServer(
+						5678,
+						"etc/testdata/summary.geojson");
+		server.start();
+		EventIDAssociator.main(new String[] {
+				// include time argument so it will run
+				EventIDAssociator.TIME_ARGUMENT + ISO8601.format(new Date()),
+				// use testing web server to get data
+				EventIDAssociator.SERVICE_URL_ARGUMENT + "http://localhost:5678/"
+		});
+		server.stop();
+	}
+
+	@Test
+	public void testLatitudeLongitudeOnly() throws Exception {
+		exit.expectSystemExitWithStatus(EventIDAssociator.EXIT_MULTIPLE_EVENTS_FOUND);
+		// serve a custom feed with multiple events
+		EventWebServiceTest.TestingWebServer server =
+				new EventWebServiceTest.TestingWebServer(
+						5679,
+						"etc/testdata/summary.geojson");
+		server.start();
+		EventIDAssociator.main(new String[] {
+				// include lat and lon argument so it will run
+				EventIDAssociator.LATITUDE_ARGUMENT + "34",
+				EventIDAssociator.LONGITUDE_ARGUMENT + "-118",
+				// use testing web server to get data
+				EventIDAssociator.SERVICE_URL_ARGUMENT + "http://localhost:5679/"
+		});
+		server.stop();
+	}
+
+	@Test
+	public void testSuccess() throws Exception {
+		// serve a custom feed with multiple events
+		EventWebServiceTest.TestingWebServer server =
+				new EventWebServiceTest.TestingWebServer(
+						5680,
+						"etc/testdata/detail.geojson");
+		server.start();
+		EventIDAssociator.main(new String[] {
+				// include lat and lon argument so it will run
+				EventIDAssociator.LATITUDE_ARGUMENT + "-4.9489",
+				EventIDAssociator.LONGITUDE_ARGUMENT + "102.3727",
+				// use testing web server to get data
+				EventIDAssociator.SERVICE_URL_ARGUMENT + "http://localhost:5680/"
+		});
+		server.stop();
+	}
+
+	@Test
+	public void testParseNetwork() {
+		String network = "testnetwork";
+
+		Assert.assertNull("default network is null",
+				EventIDAssociator.parseNetwork(new String[]{ "--latitude=123" }));
+
+		Assert.assertEquals("parse network argument", network,
+				EventIDAssociator.parseNetwork(new String[] {
+						EventIDAssociator.NETWORK_ARGUMENT + network
+				}));
+	}
+
+	@Test
+	public void testParseReferenceEvent() {
+		Date time = new Date();
+		BigDecimal latitude = new BigDecimal("34.6");
+		BigDecimal longitude = new BigDecimal("-117.8");
+		BigDecimal magnitude = new BigDecimal("3.2");
+		BigDecimal depth = new BigDecimal("34.5");
+
+		EventInfo test = EventIDAssociator.parseReferenceEvent(new String[] {
+				EventIDAssociator.TIME_ARGUMENT + ISO8601.format(time),
+				EventIDAssociator.LATITUDE_ARGUMENT + latitude.toString(),
+				EventIDAssociator.LONGITUDE_ARGUMENT + longitude.toString(),
+				EventIDAssociator.DEPTH_ARGUMENT + depth.toString(),
+				EventIDAssociator.MAGNITUDE_ARGUMENT + magnitude.toString()
+		});
+
+		Assert.assertEquals("time parsed", time, test.getTime());
+		Assert.assertEquals("latitude parsed", latitude, test.getLatitude());
+		Assert.assertEquals("longitude parsed", longitude, test.getLongitude());
+		Assert.assertEquals("depth parsed", depth, test.getDepth());
+		Assert.assertEquals("magnitude parsed", magnitude, test.getMagnitude());
+	}
+
+	@Test
+	public void testParseEventIDAssociator() throws MalformedURLException {
+		URL serviceURL = new URL("http://test.com/");
+		BigDecimal timeDifference = new BigDecimal("0.1");
+		BigDecimal locationDifference = new BigDecimal("0.2");
+		BigDecimal depthDifference = new BigDecimal("0.3");
+		BigDecimal magnitudeDifference = new BigDecimal("0.4");
+		BigDecimal timeCheck = new BigDecimal("0.5");
+		BigDecimal locationCheck = new BigDecimal("0.6");
+		BigDecimal depthCheck = new BigDecimal("0.7");
+		BigDecimal magnitudeCheck = new BigDecimal("0.8");
+
+		EventIDAssociator test = EventIDAssociator.parseEventIDAssociator(
+				new String[] {
+						EventIDAssociator.SERVICE_URL_ARGUMENT + serviceURL,
+						EventIDAssociator.TIME_DIFFERENCE_ARGUMENT + timeDifference,
+						EventIDAssociator.LOCATION_DIFFERENCE_ARGUMENT + locationDifference,
+						EventIDAssociator.DEPTH_DIFFERENCE_ARGUMENT + depthDifference,
+						EventIDAssociator.MAGNITUDE_DIFFERENCE_ARGUMENT + magnitudeDifference,
+						EventIDAssociator.TIME_CHECK_ARGUMENT + timeCheck,
+						EventIDAssociator.LOCATION_CHECK_ARGUMENT + locationCheck,
+						EventIDAssociator.DEPTH_CHECK_ARGUMENT + depthCheck,
+						EventIDAssociator.MAGNITUDE_CHECK_ARGUMENT + magnitudeCheck
+				});
+
+		Assert.assertEquals("service url parsed",
+				serviceURL, test.getEventWebService().getServiceUrl());
+
+		EventComparison compare = test.getNearbyCriteria();
+		Assert.assertEquals("time difference parsed",
+				timeDifference, compare.getTimeDifference());
+		Assert.assertEquals("location difference parsed",
+				locationDifference, compare.getLocationDifference());
+		Assert.assertEquals("depth difference parsed",
+				depthDifference, compare.getDepthDifference());
+		Assert.assertEquals("magnitude difference parsed",
+				magnitudeDifference, compare.getMagnitudeDifference());
+
+		EventSanityCheck sanity = test.getEventSanityCheck();
+		Assert.assertEquals("time difference parsed",
+				timeCheck, sanity.getTimeThreshold());
+		Assert.assertEquals("location difference parsed",
+				locationCheck, sanity.getDistanceThreshold());
+		Assert.assertEquals("depth difference parsed",
+				depthCheck, sanity.getDepthThreshold());
+		Assert.assertEquals("magnitude difference parsed",
+				magnitudeCheck, sanity.getMagnitudeThreshold());
 	}
 
 	/**
