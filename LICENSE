@@ -24,3 +24,4 @@ Libraries used to build/test package
  - jakarta-oro-2.0.8.jar   (http://jakarta.apache.org/oro/)
  - junit-4.11.jar          (http://junit.org/)
  - log4j-1.2.9.jar         (http://logging.apache.org/log4j/2.x/)
+ - system-rules-1.3.1.jar  (http://stefanbirkner.github.io/system-rules/)

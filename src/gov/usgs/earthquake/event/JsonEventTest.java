@@ -13,7 +13,7 @@ import org.junit.Test;
 
 public class JsonEventTest {
 
-	JsonEvent event = null;
+	public JsonEvent event = null;
 
 	@Before
 	public void setup() {
