@@ -205,7 +205,7 @@ public class EventWebServiceTest {
 		}
 	}
 
-	private class TestingWebServer extends ServerSocket implements Runnable {
+	public static class TestingWebServer extends ServerSocket implements Runnable {
 		private byte [] response = null;
 		private boolean useGzip = false;
 		private boolean running = false;
