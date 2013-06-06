@@ -19,12 +19,16 @@ public class EventIDAssociatorTest {
 	private EventIDAssociator testAssociator;
 	private TestEventWebService testService;
 
+	private static final BigDecimal MAGNITUDE_DIFFERENCE = new BigDecimal(".567");
+	private static final BigDecimal DEPTH_DIFFERENCE = new BigDecimal("13.2");
+
 	@Before
 	public void setup() {
 		testService = new TestEventWebService();
-		testAssociator = new EventIDAssociator(testService,
+		testAssociator = new EventIDAssociator(testService, new EventComparison(
 				EventIDAssociator.DEFAULT_TIME_DIFFERENCE,
-				EventIDAssociator.DEFAULT_LOCATION_DIFFERENCE);
+				EventIDAssociator.DEFAULT_LOCATION_DIFFERENCE, MAGNITUDE_DIFFERENCE,
+				DEPTH_DIFFERENCE), new EventSanityCheck());
 	}
 
 	/**
@@ -39,28 +43,54 @@ public class EventIDAssociatorTest {
 		event.setTime(new Date());
 		event.setLatitude(new BigDecimal("34"));
 		event.setLongitude(new BigDecimal("-118"));
+		event.setDepth(new BigDecimal("1.32"));
+		event.setMagnitude(new BigDecimal("4.5"));
 
 		EventQuery query;
+		EventComparison criteria = testAssociator.getNearbyCriteria();
 
 		testAssociator.getNearbyEvents(event, null);
 		query = testService.lastQuery;
+		long milliseconds = testAssociator.getNearbyCriteria().getTimeDifference()
+				.multiply(new BigDecimal("1000")).longValue();
 		Assert.assertEquals("expected start time", query.getStartTime(), new Date(
-				event.getTime().getTime() - EventIDAssociator.DEFAULT_TIME_DIFFERENCE));
+				event.getTime().getTime() - milliseconds));
 		Assert.assertEquals("expected end time", query.getEndTime(), new Date(event
-				.getTime().getTime() + EventIDAssociator.DEFAULT_TIME_DIFFERENCE));
+				.getTime().getTime() + milliseconds));
 		Assert.assertEquals("expected latitude", event.getLatitude(),
 				query.getLatitude());
 		Assert.assertEquals("expected longitude", event.getLongitude(),
 				query.getLongitude());
-		Assert.assertEquals("expected radius", new BigDecimal("100").divide(
-				EventIDAssociator.KILOMETERS_PER_DEGREE, MathContext.DECIMAL32), query
-				.getMaxRadius());
+		Assert.assertEquals(
+				"expected radius",
+				criteria.getLocationDifference().divide(
+						EventIDAssociator.KILOMETERS_PER_DEGREE, MathContext.DECIMAL32),
+				query.getMaxRadius());
+		Assert.assertEquals("expected min depth",
+				event.getDepth().subtract(criteria.getDepthDifference()),
+				query.getMinDepth());
+		Assert.assertEquals("expected max depth",
+				event.getDepth().add(criteria.getDepthDifference()),
+				query.getMaxDepth());
+		Assert.assertEquals("expected min magnitude", event.getMagnitude()
+				.subtract(criteria.getMagnitudeDifference()), query.getMinMagnitude());
+		Assert.assertEquals("expected max magnitude",
+				event.getMagnitude().add(criteria.getMagnitudeDifference()),
+				query.getMaxMagnitude());
+
 		Assert.assertNull("expected null network", query.getCatalog());
 
 		testAssociator.getNearbyEvents(event, "testnetwork");
 		query = testService.lastQuery;
 		Assert.assertEquals("expected null network", "testnetwork",
 				query.getCatalog());
+
+		try {
+			testAssociator.getNearbyEvents(new DefaultEventInfo(), null);
+			Assert.fail("empty event should throw exception");
+		} catch (IllegalArgumentException iae) {
+			// expected
+		}
 	}
 
 	/**

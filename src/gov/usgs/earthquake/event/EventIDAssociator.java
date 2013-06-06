@@ -32,19 +32,23 @@ public class EventIDAssociator {
 
 	public static final BigDecimal KILOMETERS_PER_DEGREE = new BigDecimal("111.2");
 
-	public static final long DEFAULT_TIME_DIFFERENCE = 16000;
+	public static final BigDecimal DEFAULT_TIME_DIFFERENCE = new BigDecimal("16");
 	public static final BigDecimal DEFAULT_LOCATION_DIFFERENCE = new BigDecimal(
 			"100");
+	public static final BigDecimal DEFAULT_MAGNITUDE_DIFFERENCE = null;
+	public static final BigDecimal DEFAULT_DEPTH_DIFFERENCE = null;
 
 	/** event web service for remote lookup. */
 	private EventWebService service;
-	private long timeDifference;
-	private BigDecimal locationDifference;
+	private EventComparison nearbyCriteria;
+	private EventSanityCheck sanityCheck;
 
 	public EventIDAssociator() throws MalformedURLException {
 		this(new EventWebService(new URL(
-				"http://comcat.cr.usgs.gov/fdsnws/event/1/")), DEFAULT_TIME_DIFFERENCE,
-				DEFAULT_LOCATION_DIFFERENCE);
+				"http://comcat.cr.usgs.gov/fdsnws/event/1/")), new EventComparison(
+				DEFAULT_TIME_DIFFERENCE, DEFAULT_LOCATION_DIFFERENCE,
+				DEFAULT_DEPTH_DIFFERENCE, DEFAULT_MAGNITUDE_DIFFERENCE),
+				new EventSanityCheck());
 	}
 
 	/**
@@ -54,10 +58,10 @@ public class EventIDAssociator {
 	 *          the event webservice to use.
 	 */
 	public EventIDAssociator(final EventWebService service,
-			final long timeDifference, final BigDecimal locationDifference) {
+			final EventComparison nearbyCriteria, final EventSanityCheck sanityCheck) {
 		this.service = service;
-		this.timeDifference = timeDifference;
-		this.locationDifference = locationDifference;
+		this.nearbyCriteria = nearbyCriteria;
+		this.sanityCheck = sanityCheck;
 	}
 
 	/**
@@ -72,24 +76,12 @@ public class EventIDAssociator {
 	 * @return a list of nearby events.
 	 * @throws Exception
 	 */
-	public List<JsonEvent> getNearbyEvents(final BigDecimal latitude,
-			final BigDecimal longitude, final Date time, final String network)
+	public List<JsonEvent> getNearbyEvents(final Date time,
+			final BigDecimal latitude, final BigDecimal longitude,
+			final BigDecimal depth, final BigDecimal magnitude, final String network)
 			throws Exception {
-		EventQuery query = new EventQuery();
-
-		// from a specific source (when not null)
-		query.setCatalog(network);
-		// time window
-		query.setStartTime(new Date(time.getTime() - timeDifference));
-		query.setEndTime(new Date(time.getTime() + timeDifference));
-		// location window
-		query.setLatitude(latitude);
-		query.setLongitude(longitude);
-		// service takes radius in degrees
-		query.setMaxRadius(locationDifference.divide(KILOMETERS_PER_DEGREE,
-				MathContext.DECIMAL32));
-
-		return service.getEvents(query);
+		return getNearbyEvents(new DefaultEventInfo(null, time, latitude,
+				longitude, depth, magnitude), network);
 	}
 
 	/**
@@ -98,14 +90,64 @@ public class EventIDAssociator {
 	 * @param info
 	 *          used for latitude, longitude, time.
 	 * @param network
-	 *          search for events from a specific network.
+	 *          search for events from a specific network, null for all networks.
 	 * @return
 	 * @throws Exception
 	 */
 	public List<JsonEvent> getNearbyEvents(final EventInfo info,
 			final String network) throws Exception {
-		return getNearbyEvents(info.getLatitude(), info.getLongitude(),
-				info.getTime(), network);
+		Date time = info.getTime();
+		BigDecimal latitude = info.getLatitude();
+		BigDecimal longitude = info.getLongitude();
+		BigDecimal depth = info.getDepth();
+		BigDecimal magnitude = info.getMagnitude();
+
+		boolean anySet = false;
+		EventQuery query = new EventQuery();
+
+		// from a specific source (when not null)
+		query.setCatalog(network);
+
+		if (time != null && nearbyCriteria.getTimeDifference() != null) {
+			long milliseconds = nearbyCriteria.getTimeDifference()
+					.multiply(new BigDecimal("1000")).longValue();
+			// time window
+			query.setStartTime(new Date(time.getTime() - milliseconds));
+			query.setEndTime(new Date(time.getTime() + milliseconds));
+			anySet = true;
+		}
+
+		if (latitude != null && longitude != null
+				&& nearbyCriteria.getLocationDifference() != null) {
+			// location window
+			query.setLatitude(latitude);
+			query.setLongitude(longitude);
+			// service takes radius in degrees
+			query.setMaxRadius(nearbyCriteria.getLocationDifference()
+					.divide(KILOMETERS_PER_DEGREE, MathContext.DECIMAL32));
+			anySet = true;
+		}
+
+		if (depth != null && nearbyCriteria.getDepthDifference() != null) {
+			query.setMinDepth(info.getDepth().subtract(
+					nearbyCriteria.getDepthDifference()));
+			query.setMaxDepth(info.getDepth().add(
+					nearbyCriteria.getDepthDifference()));
+			anySet = true;
+		}
+
+		if (magnitude != null && nearbyCriteria.getMagnitudeDifference() != null) {
+			query.setMinMagnitude(info.getMagnitude().subtract(
+					nearbyCriteria.getMagnitudeDifference()));
+			query.setMaxMagnitude(info.getMagnitude().add(
+					nearbyCriteria.getMagnitudeDifference()));
+			anySet = true;
+		}
+
+		if (!anySet) {
+			throw new IllegalArgumentException("no parameters set");
+		}
+		return service.getEvents(query);
 	}
 
 	/**
@@ -115,21 +157,17 @@ public class EventIDAssociator {
 	 *          events to sort.
 	 * @param referenceEvent
 	 *          event used for comparison.
-	 * @param sanityRules
-	 *          rules used for "distance".
 	 * @return sorted list of JsonEventInfo objects, with EventComparison and
 	 *         Distance filled in.
 	 */
 	public List<JsonEventInfo> sortEvents(final List<JsonEvent> events,
-			final EventInfo referenceEvent, EventSanityCheck sanityRules) {
+			final EventInfo referenceEvent) {
 		TreeSet<JsonEventInfo> sortedEvents = new TreeSet<JsonEventInfo>(
-				new JsonEventInfoComparator(sanityRules, referenceEvent));
+				new JsonEventInfoComparator(sanityCheck, referenceEvent));
 
 		Iterator<JsonEvent> iter = events.iterator();
 		while (iter.hasNext()) {
 			JsonEventInfo info = new JsonEventInfo(iter.next());
-			info.setEventComparison(new EventComparison(referenceEvent, info));
-			info.setDistance(sanityRules.getDistance(info.getEventComparison()));
 			sortedEvents.add(info);
 		}
 
@@ -149,14 +187,16 @@ public class EventIDAssociator {
 	 */
 	public List<JsonEventInfo> getSortedNearbyEvents(final EventInfo info,
 			final String network) throws Exception {
-		return sortEvents(getNearbyEvents(info, network), info,
-				new EventSanityCheck());
+		return sortEvents(getNearbyEvents(info, network), info);
 	}
 
 	public static final int EXIT_EVENT_NOT_FOUND = 1;
 	public static final int EXIT_EVENT_NOT_SANE = 2;
 	public static final int EXIT_MULTIPLE_EVENTS_FOUND = 4;
 	public static final int EXIT_USAGE = 255;
+
+	public static final String SERVICE_URL_ARGUMENT = "--url=";
+	public static final String DEFAULT_SERVICE_URL = "http://comcat.cr.usgs.gov/fdsnws/event/1/";
 
 	public static final String TIME_ARGUMENT = "--time=";
 	public static final String LATITUDE_ARGUMENT = "--latitude=";
@@ -165,7 +205,6 @@ public class EventIDAssociator {
 	public static final String MAGNITUDE_ARGUMENT = "--magnitude=";
 	public static final String NETWORK_ARGUMENT = "--network=";
 
-	@SuppressWarnings("unchecked")
 	public static void main(final String[] args) throws Exception {
 		// parse search arguments
 		Date time = null;
@@ -174,6 +213,13 @@ public class EventIDAssociator {
 		BigDecimal depth = null;
 		BigDecimal magnitude = null;
 		String network = null;
+		URL serviceUrl = new URL(DEFAULT_SERVICE_URL);
+
+		BigDecimal timeDifference = DEFAULT_TIME_DIFFERENCE;
+		BigDecimal locationDifference = DEFAULT_LOCATION_DIFFERENCE;
+		BigDecimal depthDifference = DEFAULT_DEPTH_DIFFERENCE;
+		BigDecimal magnitudeDifference = DEFAULT_MAGNITUDE_DIFFERENCE;
+
 		for (String arg : args) {
 			if (arg.startsWith(TIME_ARGUMENT)) {
 				time = ISO8601.parse(arg.replace(TIME_ARGUMENT, ""));
@@ -187,6 +233,8 @@ public class EventIDAssociator {
 				magnitude = new BigDecimal(arg.replace(MAGNITUDE_ARGUMENT, ""));
 			} else if (arg.startsWith(NETWORK_ARGUMENT)) {
 				network = arg.replace(NETWORK_ARGUMENT, "");
+			} else if (arg.startsWith(SERVICE_URL_ARGUMENT)) {
+				serviceUrl = new URL(arg.replace(SERVICE_URL_ARGUMENT, ""));
 			}
 		}
 
@@ -194,7 +242,8 @@ public class EventIDAssociator {
 		if (time == null || latitude == null || longitude == null) {
 			System.err.println("Usage: java EventIDAssociator"
 					+ " --time=ISO8601 --latitude=LAT --longitude=LON"
-					+ " [--depth=DEPTH] [--magnitude=MAG] [--network=NET]");
+					+ " [--depth=DEPTH] [--magnitude=MAG] [--network=NET]"
+					+ " [--url=SERVICE_URL]");
 			System.err.println("Exit values:");
 			System.err.println("\t" + 0 + " - one event found");
 			System.err.println("\t" + EXIT_EVENT_NOT_FOUND + " - no events found");
@@ -206,8 +255,9 @@ public class EventIDAssociator {
 			System.exit(EXIT_USAGE);
 		}
 
-		EventIDAssociator associator = new EventIDAssociator();
-		EventSanityCheck sanityCheck = new EventSanityCheck();
+		EventIDAssociator associator = new EventIDAssociator(new EventWebService(
+				serviceUrl), new EventComparison(timeDifference, locationDifference,
+				depthDifference, magnitudeDifference), new EventSanityCheck());
 
 		// search for nearby events
 		EventInfo referenceEvent = new DefaultEventInfo(null, time, latitude,
@@ -215,21 +265,41 @@ public class EventIDAssociator {
 		List<JsonEventInfo> events = associator.getSortedNearbyEvents(
 				referenceEvent, network);
 
+		// output results
+		System.out
+				.println(associator.formatOutput(referenceEvent, network, events));
+
+		// output exit code
+		if (events.size() == 0) {
+			System.exit(EXIT_EVENT_NOT_FOUND);
+		} else if (events.size() > 1) {
+			System.exit(EXIT_MULTIPLE_EVENTS_FOUND);
+		} else {
+			// one event, check if sane
+			if (associator.getEventSanityCheck().isMatch(
+					events.get(0).getEventComparison()) != null) {
+				System.exit(EXIT_EVENT_NOT_SANE);
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public String formatOutput(final EventInfo referenceEvent,
+			final String network, final List<JsonEventInfo> events) {
 		// build json output
 		JSONObject jsonMetadata = new JSONObject();
 		jsonMetadata.put("count", events.size());
-		jsonMetadata.put("latitude", latitude);
-		jsonMetadata.put("longitude", longitude);
+		jsonMetadata.put("time", ISO8601.format(referenceEvent.getTime()));
+		jsonMetadata.put("latitude", referenceEvent.getLatitude());
+		jsonMetadata.put("longitude", referenceEvent.getLongitude());
+		jsonMetadata.put("depth", referenceEvent.getDepth());
+		jsonMetadata.put("magnitude", referenceEvent.getMagnitude());
 		jsonMetadata.put("network", network);
-		jsonMetadata.put("magnitude", magnitude);
-		jsonMetadata.put("depth", depth);
-		jsonMetadata.put("time", ISO8601.format(time));
+
 		JSONArray jsonEvents = new JSONArray();
 		Iterator<JsonEventInfo> iter = events.iterator();
 		while (iter.hasNext()) {
 			JsonEventInfo next = iter.next();
-
-			JSONObject jsonEvent = new JSONObject(next.getEvent());
 
 			JSONObject diff = new JSONObject();
 			EventComparison comparison = next.getEventComparison();
@@ -239,6 +309,8 @@ public class EventIDAssociator {
 			diff.put("time", comparison.getTimeDifference());
 			diff.put("errorMessage", sanityCheck.isMatch(comparison));
 			diff.put("variance", next.getDistance());
+
+			JSONObject jsonEvent = new JSONObject(next.getEvent());
 			jsonEvent.put("difference", diff);
 
 			jsonEvents.add(jsonEvent);
@@ -249,19 +321,19 @@ public class EventIDAssociator {
 		output.put("type", "FeatureCollection");
 		output.put("metadata", jsonMetadata);
 		output.put("features", jsonEvents);
-		System.out.println(output.toJSONString().replace("\\/", "/"));
+		return output.toJSONString().replace("\\/", "/");
+	}
 
-		// output exit code
-		if (events.size() == 0) {
-			System.exit(EXIT_EVENT_NOT_FOUND);
-		} else if (events.size() > 1) {
-			System.exit(EXIT_MULTIPLE_EVENTS_FOUND);
-		} else {
-			// one event, check if sane
-			if (sanityCheck.isMatch(events.get(0).getEventComparison()) != null) {
-				System.exit(EXIT_EVENT_NOT_SANE);
-			}
-		}
+	public EventWebService getEventWebService() {
+		return service;
+	}
+
+	public EventComparison getNearbyCriteria() {
+		return nearbyCriteria;
+	}
+
+	public EventSanityCheck getEventSanityCheck() {
+		return sanityCheck;
 	}
 
 }
