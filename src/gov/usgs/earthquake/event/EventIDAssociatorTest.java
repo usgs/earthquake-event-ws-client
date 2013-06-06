@@ -211,6 +211,42 @@ public class EventIDAssociatorTest {
 		System.err.println(testAssociator.formatOutput(reference, null, sorted));
 	}
 
+	@Test
+	public void testExitCodes() throws Exception {
+		// add out of order to events list
+		JsonEventInfoComparatorTest comparatorTest = new JsonEventInfoComparatorTest();
+		comparatorTest.setup();
+		testService.events.add(comparatorTest.farEvent);
+		testService.events.add(comparatorTest.fartherEvent);
+		testService.events.add(comparatorTest.closeEvent);
+		JsonEventInfo reference = new JsonEventInfo(comparatorTest.referenceEvent);
+		List<JsonEventInfo> sorted = testAssociator.getSortedNearbyEvents(
+				reference, null);
+		JsonEventInfo good = sorted.get(0);
+		JsonEventInfo bad = sorted.get(2);
+
+		// no events
+		Assert.assertEquals("no events",
+				EventIDAssociator.EXIT_EVENT_NOT_FOUND,
+				testAssociator.getExitCode(new ArrayList<JsonEventInfo>()));
+		// multiple events
+		Assert.assertEquals("multiple events", 
+				EventIDAssociator.EXIT_MULTIPLE_EVENTS_FOUND,
+				testAssociator.getExitCode(sorted));
+		// one good event
+		sorted.clear();
+		sorted.add(good);
+		Assert.assertEquals("one good event",
+				EventIDAssociator.EXIT_SUCCESS,
+				testAssociator.getExitCode(sorted));
+		// one bad event
+		sorted.clear();
+		sorted.add(bad);
+		Assert.assertEquals("one bad event",
+				EventIDAssociator.EXIT_EVENT_NOT_SANE,
+				testAssociator.getExitCode(sorted));
+	}
+
 	/**
 	 * Test event web service that returns empty list of events, and captures
 	 * queries for inspection.
