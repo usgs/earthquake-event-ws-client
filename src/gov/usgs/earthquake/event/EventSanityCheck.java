@@ -148,4 +148,17 @@ public class EventSanityCheck {
 		return Math.sqrt(diff);
 	}
 
+	public BigDecimal getTimeThreshold() {
+		return timeThreshold;
+	}
+	public BigDecimal getDistanceThreshold() {
+		return distanceThreshold;
+	}
+	public BigDecimal getDepthThreshold() {
+		return depthThreshold;
+	}
+	public BigDecimal getMagnitudeThreshold() {
+		return magnitudeThreshold;
+	}
+
 }

@@ -170,4 +170,8 @@ public class EventWebService {
 		return events;
 	}
 
+	public URL getServiceUrl() {
+		return serviceURL;
+	}
+
 }
