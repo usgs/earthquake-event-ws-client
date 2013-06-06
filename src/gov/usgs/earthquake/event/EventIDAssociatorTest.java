@@ -7,10 +7,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Rule;
+import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 
 /**
  * Tests for EventIDAssociator.
@@ -22,6 +23,10 @@ public class EventIDAssociatorTest {
 
 	private static final BigDecimal MAGNITUDE_DIFFERENCE = new BigDecimal(".567");
 	private static final BigDecimal DEPTH_DIFFERENCE = new BigDecimal("13.2");
+
+	/** Used to test System.exit() calls. */
+	@Rule
+	public final ExpectedSystemExit exit = ExpectedSystemExit.none();
 
 	@Before
 	public void setup() {
@@ -245,6 +250,12 @@ public class EventIDAssociatorTest {
 		Assert.assertEquals("one bad event",
 				EventIDAssociator.EXIT_EVENT_NOT_SANE,
 				testAssociator.getExitCode(sorted));
+	}
+
+	@Test
+	public void testUsage() throws Exception {
+		exit.expectSystemExitWithStatus(EventIDAssociator.EXIT_USAGE);
+		EventIDAssociator.main(new String[] { "--help" });
 	}
 
 	/**
