@@ -1,17 +1,13 @@
 package gov.usgs.earthquake.event;
 
 import java.io.InputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -21,13 +17,6 @@ import org.json.simple.parser.JSONParser;
  * A wrapper around the Event Web Service.
  */
 public class EventWebService {
-
-	/** ISO8601 date formatting object. */
-	public static final SimpleDateFormat ISO8601_FORMAT = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-	static {
-		ISO8601_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
-	}
 
 	/** Base URL to the event web service. */
 	private final URL serviceURL;
@@ -60,7 +49,7 @@ public class EventWebService {
 		params.put("alertlevel", query.getAlertLevel());
 		params.put("catalog", query.getCatalog());
 		params.put("contributor", query.getContributor());
-		params.put("endtime", getIso8601Date(query.getEndTime()));
+		params.put("endtime", ISO8601.format(query.getEndTime()));
 		params.put("eventid", query.getEventId());
 		params.put("eventtype", query.getEventType());
 		params.put("format", format == null ? query.getFormat() : format);
@@ -96,8 +85,8 @@ public class EventWebService {
 		params.put("orderby", query.getOrderBy());
 		params.put("producttype", query.getProductType());
 		params.put("reviewstatus", query.getReviewStatus());
-		params.put("starttime", getIso8601Date(query.getStartTime()));
-		params.put("updatedafter", getIso8601Date(query.getUpdatedAfter()));
+		params.put("starttime", ISO8601.format(query.getStartTime()));
+		params.put("updatedafter", ISO8601.format(query.getUpdatedAfter()));
 
 		String queryString = UrlUtil.getQueryString(params);
 		return new URL(serviceURL, "query" + queryString);
@@ -179,21 +168,10 @@ public class EventWebService {
 		}
 
 		return events;
-
 	}
 
-	/**
-	 * Utility method to encode a Date using ISO8601, when not null.
-	 *
-	 * @param date
-	 *          date to encode.
-	 * @return iso8601 encoded date, or null if date is null.
-	 */
-	protected static String getIso8601Date(final Date date) {
-		if (date == null) {
-			return null;
-		}
-		return ISO8601_FORMAT.format(date);
+	public URL getServiceUrl() {
+		return serviceURL;
 	}
 
 }
