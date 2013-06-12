@@ -95,7 +95,7 @@ public class UrlUtilTest {
 					out.println("Content-Encoding: gzip");
 					out.println();
 					out.flush();
-					GZIPOutputStream gzip = new GZIPOutputStream(request.getOutputStream());
+					new GZIPOutputStream(request.getOutputStream());
 				} catch (Exception ex) {
 					Assert.fail(ex.getMessage());
 				}
