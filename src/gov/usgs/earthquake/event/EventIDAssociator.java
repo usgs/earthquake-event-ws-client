@@ -168,6 +168,12 @@ public class EventIDAssociator {
 		Iterator<JsonEvent> iter = events.iterator();
 		while (iter.hasNext()) {
 			JsonEventInfo info = new JsonEventInfo(iter.next());
+
+			// JsonEventInfoComparator does this too,
+			// but only when multiple matching events are found
+			info.setEventComparison(new EventComparison(referenceEvent, info));
+			info.setDistance(sanityCheck.getDistance(info.getEventComparison()));
+
 			sortedEvents.add(info);
 		}
 
