@@ -109,7 +109,12 @@ public class EventWebService {
 			result = UrlUtil.getInputStream(getUrl(query, Format.GEOJSON));
 			events = parseJsonEventCollection(result);
 		} finally {
-			result.close();
+			try {
+				result.close();
+			} catch (NullPointerException npx) {
+				// Don't throw null pointer exceptions because they mask the real
+				// exception, eg, that an error occurred during I/O.
+			}
 		}
 
 		return events;
