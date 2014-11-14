@@ -55,10 +55,10 @@ public class EventWebServiceTest {
 		query.setMinMagnitude(new BigDecimal("2.5"));
 
 		expected = new URL(
-				"http://comcat.cr.usgs.gov/fdsnws/event/1/query?" +
-				"minmagnitude=2.5" +
-				"&starttime=" + ISO8601.format(query.getStartTime()) +
-				"&format=geojson");
+				"http://comcat.cr.usgs.gov/fdsnws/event/1/query" +
+				"?format=geojson" +
+				"&minmagnitude=2.5" +
+				"&starttime=" + ISO8601.format(query.getStartTime()));
 
 		// Test with an explicit format
 		Assert.assertEquals("Query url matches (explicit format).",

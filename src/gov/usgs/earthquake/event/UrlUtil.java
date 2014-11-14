@@ -6,6 +6,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.TreeSet;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -50,7 +51,7 @@ public class UrlUtil {
 		StringBuffer buf = new StringBuffer();
 		boolean first = true;
 
-		Iterator<String> iter = params.keySet().iterator();
+		Iterator<String> iter = new TreeSet<String>(params.keySet()).iterator();
 		while (iter.hasNext()) {
 			String key = iter.next();
 			Object value = params.get(key);
