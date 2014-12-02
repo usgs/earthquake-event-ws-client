@@ -15,26 +15,67 @@ import java.util.zip.GZIPInputStream;
 public class UrlUtil {
 
 	public static final String GZIP_ENCODING = "gzip";
+	public static final int DEFAULT_GET_INPUT_STREAM_TRIES = 3;
+
+
+	/**
+	 * Open a URL attempting to use gzip compression. Will try
+	 * DEFAULT_GET_INPUT_STREAM_TRIES times.
+	 *
+	 * @param url
+	 *      url to open
+	 * @return opened InputStream, ready to be read.
+	 * @throws IOException
+	 */
+	public static InputStream getInputStream (final URL url) throws Exception {
+		return getInputStream(url, DEFAULT_GET_INPUT_STREAM_TRIES);
+	}
 
 	/**
 	 * Open a URL attempting to use gzip compression.
 	 *
 	 * @param url
-	 *          url to open
+	 *      url to open
+	 * @param tries
+	 *      number of times to try
 	 * @return opened InputStream, ready to be read.
 	 * @throws IOException
 	 */
-	public static InputStream getInputStream(final URL url) throws IOException {
-		// request gzip
-		URLConnection conn = url.openConnection();
-		conn.addRequestProperty("Accept-encoding", GZIP_ENCODING);
-		conn.connect();
+	public static InputStream getInputStream (final URL url, int tries)
+			throws Exception {
+		Exception exception = null;
+		URLConnection conn = null;
+		InputStream in = null;
+		boolean success = false;
 
-		InputStream in = conn.getInputStream();
+		while (!success && tries-- > 0) {
+			try {
+				// request gzip
+				conn = url.openConnection();
+				conn.addRequestProperty("Accept-encoding", GZIP_ENCODING);
+				conn.connect();
 
-		// ungzip response
-		if (GZIP_ENCODING.equals(conn.getContentEncoding())) {
-			in = new GZIPInputStream(in);
+				in = conn.getInputStream();
+
+				// ungzip response
+				if (GZIP_ENCODING.equals(conn.getContentEncoding())) {
+					in = new GZIPInputStream(in);
+				}
+
+				success = true;
+			} catch (Exception ex) {
+				exception = ex;
+				// Just ignore for now...
+				// TODO :: Maybe log ?
+			}
+		}
+
+		if (!success) {
+			if (exception == null) {
+				exception = new Exception("An unknown error occurred.");
+				exception.fillInStackTrace();
+			}
+			throw exception;
 		}
 
 		return in;
